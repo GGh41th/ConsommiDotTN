@@ -1,9 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { Role } from "src/enum/user-role.enum";
 
-export enum Role {
-    ADMIN= "admin",
-    USER    = "user",
-}
+
 
 class AddressClass {
     @Prop({ required: true })

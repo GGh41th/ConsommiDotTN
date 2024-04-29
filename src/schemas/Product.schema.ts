@@ -1,47 +1,9 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import e from "express";
 import { identity } from "rxjs";
-export enum Category {
-    ALIMENTATION = "alimentation",
-    ANIMAL="animal",
-    CAR="car",
-    CLOTHES="clothes",
-    TECH="tech",
-    FURNITURE="furniture",
-    JEWELRY="jewelry",
-}
-export enum City {
-    ALL="all",
-    ARIANA="ariana",
-    BEJA="beja",
-    BEN_AROUS="ben arous",
-    BIZERTE="bizerte",
-    GABES="gabes",
-    GAFSA="gafsa",
-    JENDOUBA="jendouba",
-    KAIROUAN="kairouan",
-    KASSERINE="kasserine",
-    Kebili="kebili",
-    KEF="kef",
-    MAHDIA="mahdia",
-    MANOUBA="manouba",
-    MEDENINE="medenine",    
-    MONASTIR="monastir",
-    NABEUL="nabeul",
-    SFAX="sfax",
-    SIDI_BOUZID="sidi bouzid",
-    SILIANA="siliana",
-    SOUSSE="sousse",
-    TATAOUINE="tataouine",
-    TOZEUR="tozeur",
-    TUNIS="tunis",
-    ZAGHOUAN="zaghouan",
-}
-export enum ApproveStatus {
-    APPROVED="approved",
-    PENDING="pending",
-    REJECTED="rejected",
-}
+import { City } from "src/enum/city.enum";
+import { ApproveStatus } from "src/enum/product-approve-status.enum";
+import { Category } from "src/enum/product-category.enum";
 
 @Schema()
 export class Product {
