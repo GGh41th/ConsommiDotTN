@@ -54,13 +54,13 @@ export class Product {
     description;
     @Prop({required: true})
     price: number;
-    @Prop({required: true})
-    stock: number;
+    @Prop({required: true,default:1})
+    quantity: number;
     @Prop({required: true,default:0,max:100,min:0})
     discount: number;
     @Prop({required: true})
     isAvailable: boolean;
-    @Prop({required: true})
+    @Prop({required: true, default:true})
     status:ApproveStatus;
     @Prop({required: true})
     category:Category;
@@ -122,7 +122,7 @@ export const TechSchema = SchemaFactory.createForClass(Tech);
 
 @Schema()
 export class Subscription {
-    @Prop({required: true})
+    @Prop({required: true, default:0})
     alertprice: number;
     @Prop({required: true})
     availability: string;
