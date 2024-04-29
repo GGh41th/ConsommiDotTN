@@ -7,5 +7,3 @@ export enum Category {
     FURNITURE="furniture",
     JEWELRY="jewelry",
 }
-
-
