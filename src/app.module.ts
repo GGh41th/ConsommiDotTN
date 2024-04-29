@@ -4,16 +4,17 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Mongoose } from 'mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+import * as dotenv from 'dotenv';
 
-
+dotenv.config();
 @Module({
   imports: [MongooseModule.forRoot(process.env.MONGO_URI),
     ConfigModule.forRoot({isGlobal: true}),
-    UsersModule
+    UsersModule,
+    
    ],
-  controllers: [AppController, UsersController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
