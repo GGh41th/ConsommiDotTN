@@ -17,7 +17,7 @@ export class User {
     phone: string;
     @Prop({ required: true })
     lastName: string;
-    @Prop({ required: true })
+    @Prop({ required: true  ,default: false})
     isApproved: boolean;
     @Prop({ required: true, enum:Role,default:Role.USER }) // Reference the Role enum
     role: Role;

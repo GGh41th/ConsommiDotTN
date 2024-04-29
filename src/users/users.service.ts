@@ -14,7 +14,15 @@ export class UsersService {
 
   
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    //print the user
+    const uuid = require('uuid');
+    const newUser ={
+      id: uuid.v4(),
+      ...createUserDto,
+    }
+    console.log(newUser);
+    const user = new this.userModel(newUser);
+    return user.save();
   }
   
   CreateFirstUser() {
@@ -44,15 +52,19 @@ export class UsersService {
     return `This action returns all users`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  update(id: string, updateUserDto: UpdateUserDto) {
+    //update the user where id is the user id
+    const user = this.userModel.findOneAndUpdate({id:id},updateUserDto);
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    //delete the user
+    const user = this.userModel.findOneAndUpdate({id:id});
+    return user;
   }
 }
