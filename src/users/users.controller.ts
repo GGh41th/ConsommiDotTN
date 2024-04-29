@@ -17,6 +17,10 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
+  @Get('createFirstUser')
+  CreateFirstUser() {
+    return this.usersService.CreateFirstUser();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

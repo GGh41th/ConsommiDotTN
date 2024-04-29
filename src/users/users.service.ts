@@ -1,12 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from './entities/user.entity';
+import { get } from 'http';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>,
+  ) {}
+
+  
   create(createUserDto: CreateUserDto) {
     return 'This action adds a new user';
   }
+  
+  CreateFirstUser() {
+    //new uuid
+    const uuid = require('uuid');
+    
+    const user = new this.userModel({
+      
+      id: uuid.v4(),
+      name: 'John',
+      lastName: 'Doe',
+      email: 'John@mail',
+      password: '12345678',
+      phone: '12345678',
+      address: {
+        city: 'Tunis',
+        street: 'Tunis',
+        postalCode: '1000',
+      },
+      isApproved: true,
+      role: 'admin',});
+    return user.save();
+  }
+
 
   findAll() {
     return `This action returns all users`;

@@ -10,7 +10,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 @Module({
-  imports: [MongooseModule.forRoot(process.env.MONGO_URI),
+  imports: [MongooseModule.forRoot(process.env.MONGO_URI||"mongodb+srv://consommi:consommi@mainnode.m4kefk0.mongodb.net/?retryWrites=true&w=majority&appName=MainNode"
+),
     ConfigModule.forRoot({isGlobal: true}),
     UsersModule,
     ProductModule,

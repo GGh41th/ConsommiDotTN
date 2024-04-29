@@ -11,12 +11,12 @@ class AddressClass {
     @Prop({ required: true })
     street: string;
     @Prop({ required: true })
-    zipCode: string;
+    postalCode: string;
 }
 
 @Schema()
 export class User {
-    @Prop({ required: true, unique: true })
+    @Prop({ required: true, unique: true   })
     id: string;
     @Prop({ required: true })
     address: AddressClass;
