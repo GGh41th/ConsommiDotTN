@@ -4,14 +4,14 @@ import { ApproveStatus } from "src/enum/product-approve-status.enum";
 import { Category } from "src/enum/product-category.enum";
 
 @Schema()
-export class Product {
+export class Product  {
     //id in prop
     @Prop({required: true, unique: true})
     id: string;
     @Prop({required: true})
     name: string;
     @Prop({required: true})
-    description;
+    description:string;
     @Prop({required: true})
     price: number;
     @Prop({required: true,default:1})
@@ -26,4 +26,32 @@ export class Product {
     category:Category;
     @Prop({required: true})
     location:City;
+    @Prop({required: true, type: Object})
+    details: ClothesDetails | TechDetails;
 }
+type ClothesDetails ={
+    brand: string;
+    color: number;
+    functionality: string;
+    material: string;
+    seasonality: string;
+    size: string;
+    style: string;
+    type: string;
+}
+
+type TechDetails ={
+    batteryLife: string;
+    brand: string;
+    cpu: string;
+    features: string;
+    gpu: string;
+    os: string;
+    ram: string;
+    screenSize: string;
+    storage: string;
+    type: string;
+
+} 
+    
+

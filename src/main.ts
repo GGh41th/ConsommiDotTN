@@ -14,11 +14,11 @@ async function bootstrap() {
 
   const PORT = process.env.PORT || 3000;
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist : true  , forbidNonWhitelisted: true }));
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   await app.listen(PORT);
-  log("App is runnning at: http://localhost:"+PORT)
+  log('App is runnning at: http://localhost:' + PORT);
 }
 
 bootstrap();

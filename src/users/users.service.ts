@@ -49,22 +49,42 @@ export class UsersService {
 
 
   findAll() {
-    return `This action returns all users`;
+    return this.userModel.find();
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} user`;
+    //verify the user exist
+    this.verifyUserExsitance(id);
+    //find the user
+    const user = this.userModel.findOne({id:id});
+    return user;
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    //update the user where id is the user id
+    //verify the user exist
+    this.verifyUserExsitance(id);
+    
     const user = this.userModel.findOneAndUpdate({id:id},updateUserDto);
+    
     return user;
   }
 
   remove(id: string) {
+    //verify the user exist
+    this.verifyUserExsitance(id);
     //delete the user
     const user = this.userModel.findOneAndUpdate({id:id});
     return user;
   }
+   
+  verifyUserExsitance(id: string) {
+    //verify the user exist
+    const finduser = this.userModel.findOne({id:id});
+    if((!finduser)){
+      throw new Error('User not found');
+    }
+   
+  }
+
+
 }
