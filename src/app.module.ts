@@ -6,7 +6,10 @@ import { Mongoose } from 'mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { ProductModule } from './product/product.module';
+import { AuthModule } from './auth/auth.module';
 import * as dotenv from 'dotenv';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/roles/roles.guard';
 
 dotenv.config();
 @Module({
@@ -15,9 +18,14 @@ dotenv.config();
     ConfigModule.forRoot({isGlobal: true}),
     UsersModule,
     ProductModule,
-    
+    AuthModule
    ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [ AppService,
+    {
+      provide: APP_GUARD, // Use APP_GUARD token
+      useClass: RolesGuard, // Specify the guard class
+    },]
+
 })
 export class AppModule {}

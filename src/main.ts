@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { log } from 'console';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { RolesGuard } from './auth/roles/roles.guard';
+import { Roles } from './auth/roles/roles.decorator';
 
 async function bootstrap() {
   const config = new DocumentBuilder()
