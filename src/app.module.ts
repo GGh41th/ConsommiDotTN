@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import * as dotenv from 'dotenv';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './auth/roles/roles.guard';
+import { ImageModule } from './image/image.module';
 
 dotenv.config();
 @Module({
@@ -18,7 +19,8 @@ dotenv.config();
     ConfigModule.forRoot({isGlobal: true}),
     UsersModule,
     ProductModule,
-    AuthModule
+    AuthModule,
+    ImageModule
    ],
   controllers: [AppController],
   providers: [ AppService,

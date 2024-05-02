@@ -4,23 +4,33 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product } from './entities/product.entity';
+import * as fs from 'fs';
+import { ImageService } from 'src/image/image.service';
 
 @Injectable()
 export class ProductService {
 constructor
 (
   @InjectModel('Product') private readonly productModel: Model<Product>,
+  private readonly imageService: ImageService,
 ) {}
 
 
   create(createProductDto: CreateProductDto) {
     const uuid= require('uuid');
+    const image = createProductDto.image;
+   
+    delete createProductDto.image;
     const newProduct = {
       id: uuid.v4(),
       ...createProductDto,
+      image: [image],
     };
-    console.log(newProduct);
+    
     const product = new this.productModel(newProduct);
+    this.imageService.changeImagepath(image, newProduct.id);
+    
+ 
     return product.save();
   }
   

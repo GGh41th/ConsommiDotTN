@@ -27,6 +27,8 @@ export class CreateProductDto {
   @IsNotEmpty()
   location: City;
   @IsNotEmpty()
+  image: string;
+  @IsNotEmpty()
   @ValidateNested()
   @Type((value: any) =>{
     console.log(JSON.stringify

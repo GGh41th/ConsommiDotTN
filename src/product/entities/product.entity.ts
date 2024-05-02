@@ -28,6 +28,8 @@ export class Product  {
     location:City;
     @Prop({required: true, type: Object})
     details: ClothesDetails | TechDetails;
+    @Prop({required: true,default:[]} )
+    images: string[];
 }
 type ClothesDetails ={
     brand: string;

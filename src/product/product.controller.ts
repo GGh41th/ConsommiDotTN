@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles/roles.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 @ApiTags("product")
-@Roles(['admin'])
+//@Roles(['admin'])
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -34,6 +35,8 @@ export class ProductController {
   remove(@Param('id') id: string) {
     return this.productService.remove(+id);
   }
+  
+  
 }
 
 
