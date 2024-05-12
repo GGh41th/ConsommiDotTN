@@ -7,10 +7,15 @@ import {
 import { Reflector } from '@nestjs/core';
 import { log } from 'console';
 import { Roles } from './roles.decorator';
+import { Observable } from 'rxjs';
+import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {
+  constructor(private reflector: Reflector,
+  ) {
     log('instanciated RolesGuard');
   }
 
@@ -39,4 +44,6 @@ export class RolesGuard implements CanActivate {
     }
     return ['root'].includes(user.name);
   }
+  
 }
+

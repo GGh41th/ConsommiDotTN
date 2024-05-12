@@ -1,24 +1,43 @@
 import { Prop, Schema } from "@nestjs/mongoose";
-import { Address } from "src/common/address/address";
 import { Role } from "src/enum/user-role.enum";
+
 @Schema()
 export class User {
-    @Prop({ required: true, unique: true   })
-    id: string;
-    @Prop({ required: true })
-    address: Address;
-    @Prop({ required: true })
-    email: string;
-    @Prop({ required: true })
-    name: string;
-    @Prop({ required: true })
-    password: string;
-    @Prop({ required: true, maxlength: 8, minlength: 8 })
-    phone: string;
-    @Prop({ required: true })
-    lastName: string;
-    @Prop({ required: true  ,default: false})
-    isApproved: boolean;
-    @Prop({ required: true, enum:Role,default:Role.USER }) // Reference the Role enum
-    role: Role;
+  constructor() {
+    this.role = Role.USER;
+    this.isApproved = false;
+  }
+
+  static fromDoc(doc: any): User {
+    const { _id = null, __v = null, ...user } = { ...doc };
+
+    return user;
+  }
+
+  @Prop()
+  id: string;
+  @Prop({ required: true })
+  email: string;
+  @Prop({ required: true })
+  name: string;
+  @Prop({ required: true })
+  lastName: string;
+  @Prop({ required: true })
+  password: string;
+
+  @Prop({ maxlength: 8, minlength: 8 })
+  phone: string;
+
+  @Prop()
+  city: string;
+  @Prop()
+  street: string;
+  @Prop()
+  postalCode: string;
+
+  @Prop({ required: true, default: false })
+  isApproved: boolean;
+
+  @Prop({ required: true, enum: Role, default: Role.USER }) // Reference the Role enum
+  role: Role;
 }
