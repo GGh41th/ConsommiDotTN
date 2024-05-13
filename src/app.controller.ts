@@ -8,6 +8,8 @@ import {
 import { AppService } from "./app.service";
 import { ApiTags } from "@nestjs/swagger";
 import { PrimalJwtGuard } from "./auth/token/primal.guard";
+import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
+import { CurrentUser } from "./auth/decorators/user.decorator";
 
 @Controller()
 @ApiTags("Genral")
@@ -15,22 +17,9 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get("test")
-  async test() {
-    const bcr = require("bcrypt");
-    const salt = await bcr.genSalt();
-    console.log(await bcr.genSalt());
-    console.log(await bcr.genSalt());
-    console.log(await bcr.genSalt());
-    console.log(await bcr.genSalt());
-    const pass = await bcr.hash("kjk", salt);
-    const isit = await bcr.compare(pass, pass);
-
-    console.log("salt");
-    console.log(salt);
-    console.log("pass");
-    console.log(pass);
-    console.log("isit");
-    console.log(isit);
+  @UseGuards(JwtAuthGuard)
+  async test(@CurrentUser() user) {
+    return user;
   }
 
   @Get()
