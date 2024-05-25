@@ -1,4 +1,5 @@
 import { Prop, Schema } from "@nestjs/mongoose";
+import mongoose from "mongoose";
 import { Role } from "src/enum/user-role.enum";
 
 @Schema()
@@ -40,4 +41,7 @@ export class User {
 
   @Prop({ required: true, enum: Role, default: Role.USER }) // Reference the Role enum
   role: Role;
+  //relation product
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }] })
+  products: string[];
 }

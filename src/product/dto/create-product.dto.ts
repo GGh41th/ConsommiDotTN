@@ -1,7 +1,7 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, Optional } from '@nestjs/common';
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 import { Type } from 'class-transformer';
-import { IsDefined, IsEnum, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { City } from 'src/enum/city.enum';
 import { ApproveStatus } from 'src/enum/product-approve-status.enum';
 import { Category } from 'src/enum/product-category.enum';
@@ -45,34 +45,76 @@ export class CreateProductDto {
 }
 
 export class ClothesDetailsDto {
-  @IsNotEmpty()
-  brand: string;
   @IsOptional()
-  color: number;
+  @IsString()
+  brand?: string;
+
   @IsOptional()
-  functionality: string;
+  @IsString()
+  color?: string;
+
   @IsOptional()
-  material: string;
+  @IsString()
+  functionality?: string;
+
   @IsOptional()
-  seasonality: string;
+  @IsString()
+  material?: string;
+
   @IsOptional()
-  size: string;
+  @IsString()
+  seasonality?: string;
+
   @IsOptional()
-  style: string;
+  @IsString()
+  size?: string;
+
   @IsOptional()
-  type: string;
+  @IsString()
+  style?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
 }
 
 export class TechDetailsDto {
-  batteryLife: string;
-  brand: string;
-  cpu: string;
-  features: string;
-  gpu: string;
-  os: string;
-  ram: string;
-  screenSize: string;
-  storage: string;
+  @IsOptional()
+  @IsString()
+  batteryLife?: string;
+
+  @IsOptional()
+  @IsString()
+  brand?: string;
+
+  @IsOptional()
+  @IsString()
+  cpu?: string;
+
+  @IsOptional()
+  @IsString()
+  features?: string;
+
+  @IsOptional()
+  @IsString()
+  gpu?: string;
+
+  @IsOptional()
+  @IsString()
+  os?: string;
+
+  @IsOptional()
+  @IsString()
+  ram?: string;
+
+  @IsOptional()
+  @IsString()
+  screenSize?: string;
+
+  @IsOptional()
+  @IsString()
+  storage?: string;
+
   @IsNotEmpty()
   type: string;
 }

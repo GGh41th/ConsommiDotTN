@@ -5,6 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { get } from 'http';
 @ApiTags("product")
 //@Roles(['admin'])
 @Controller('product')
@@ -13,7 +14,7 @@ export class ProductController {
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+    return this.productService.create(createProductDto,"665266c3d9dc897e34356cc5");
   }
 
   @Get()
@@ -24,6 +25,10 @@ export class ProductController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productService.findOne(+id);
+  }
+  @Get('owner/:id')
+  getProductOwner(@Param('id') id: string) {
+    return this.productService.getProductOwner(id);
   }
 
   @Patch(':id')

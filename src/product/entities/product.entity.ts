@@ -1,4 +1,5 @@
 import { Prop, Schema } from "@nestjs/mongoose";
+import mongoose from "mongoose";
 import { City } from "src/enum/city.enum";
 import { ApproveStatus } from "src/enum/product-approve-status.enum";
 import { Category } from "src/enum/product-category.enum";
@@ -30,6 +31,9 @@ export class Product  {
     details: ClothesDetails | TechDetails;
     @Prop({required: true,default:[]} )
     images: string[];
+    //relation user
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
+    owner: string;
 }
 type ClothesDetails ={
     brand: string;

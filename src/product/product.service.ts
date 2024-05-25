@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,7 @@ import { Model } from 'mongoose';
 import { Product } from './entities/product.entity';
 import * as fs from 'fs';
 import { ImageService } from 'src/image/image.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class ProductService {
@@ -16,7 +17,7 @@ constructor
 ) {}
 
 
-  create(createProductDto: CreateProductDto) {
+  create(createProductDto: CreateProductDto,userid: string) {
     const uuid= require('uuid');
     const image = createProductDto.image;
    
@@ -25,6 +26,7 @@ constructor
       id: uuid.v4(),
       ...createProductDto,
       image: [image],
+      owner: userid,
     };
     
     const product = new this.productModel(newProduct);
@@ -34,6 +36,15 @@ constructor
     return product.save();
   }
   
+  async getProductOwner(productId: string) {
+    const product = await this.productModel.findOne({ id: productId }).populate('owner').exec();
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+
+    return product.owner;
+  }
 
   findAll() {
     return `This action returns all product`;
