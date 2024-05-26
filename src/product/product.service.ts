@@ -3,15 +3,8 @@ import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import {
-  ClothesDetails,
-  FurnitureDetails,
-  JewelryDetails,
-  Product,
-  TechDetails,
-} from "./entities/product.entity";
+import { Product } from "./entities/product.entity";
 import { ImageService } from "src/image/image.service";
-import { Category } from "../enum/product-category.enum";
 
 @Injectable()
 export class ProductService {
@@ -26,18 +19,19 @@ export class ProductService {
     return await productDocument.save();
   }
 
-  create(createProductDto: CreateProductDto, userid: string) {
+  async create(createProductDto: CreateProductDto, userid: string) {
     const image = createProductDto.image;
     delete createProductDto.image;
     let newProduct = new Product(userid);
-    let detail:
+    /*let details:
       | ClothesDetails
       | TechDetails
       | JewelryDetails
       | FurnitureDetails
-      | Details;
+      | AnimalDetails;
     switch (createProductDto.category) {
       case Category.ALIMENTATION:
+        details =
         break;
       case Category.ANIMAL:
       case Category.CAR:
@@ -45,16 +39,16 @@ export class ProductService {
       case Category.FURNITURE:
       case Category.JEWELRY:
       case Category.TECH:
-    }
-    createProductDto.details.newProduct = {
+    }*/
+    newProduct = {
       ...newProduct,
       ...createProductDto,
     };
 
-    const product = new this.productModel(newProduct);
-    this.imageService.changeImagepath(image, newProduct.id);
+    let added = await this.add(newProduct);
+    this.imageService.changeImagepath(image, added.id);
 
-    return product.save();
+    return Product.fromDoc(added);
   }
 
   async getProductOwner(productId: string) {

@@ -47,7 +47,7 @@ export class Product {
   @Prop({ required: true })
   location: City;
   @Prop({ required: false, type: Object })
-  details: ClothesDetails | TechDetails;
+  details: any;
   @Prop({ required: true, default: [] })
   images: string[];
   //relation user
@@ -55,7 +55,7 @@ export class Product {
   owner: string;
 }
 
-export type ClothesDetails = {
+export class ClothesDetails {
   brand: string;
   color: number;
   functionality: string;
@@ -64,9 +64,9 @@ export type ClothesDetails = {
   size: string;
   style: string;
   type: string;
-};
+}
 
-export type TechDetails = {
+export class TechDetails {
   batteryLife: string;
   brand: string;
   cpu: string;
@@ -77,7 +77,7 @@ export type TechDetails = {
   screenSize: string;
   storage: string;
   type: string;
-};
+}
 
 export type JewelryDetails = {};
 export type FurnitureDetails = {};
