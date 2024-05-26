@@ -9,6 +9,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  NotFoundException,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -19,12 +20,18 @@ import { CurrentUser } from "../auth/decorators/user.decorator";
 import { User } from "../users/entities/user.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
+import { SubscriptionService } from "src/subscription/subscription.service";
+import { SseService } from "src/sse/see.service";
 
 @ApiTags("product")
 //@Roles(['admin'])
 @Controller("product")
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly sseService: SseService,
+    private readonly subscriptionService: SubscriptionService,
+  ) {}
 
   @Post("/create/:imageId?")
   @UseGuards(JwtAuthGuard)
@@ -52,22 +59,26 @@ export class ProductController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.productService.findAll();
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("property")
   async getMyProducts(@CurrentUser() user) {
-    return this.productService.findByUserId(user.id);
-  }
-
-  @UseGuards(JwtAuthGuard)
+    return this.productService.findByUserId(user.id);}
   @Get(":id")
-  async findOne(@CurrentUser() user: User, @Param("id") id: string) {}
+  async findOne(@Param("id") id: string) {
+    const product = await this.productService.findOne(id);
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
+  }
+  
 
   @Get("owner/:id")
-  getProductOwner(@Param("id") id: string) {
+  async getProductOwner(@Param("id") id: string) {
     return this.productService.getProductOwner(id);
   }
 

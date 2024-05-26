@@ -5,7 +5,7 @@ import { Role } from "src/enum/user-role.enum";
 @Schema()
 export class User {
   constructor() {
-    this.role = Role.USER;
+    this.role = Role.CONSUMER;
     this.isApproved = false;
   }
 
@@ -39,7 +39,7 @@ export class User {
   @Prop({ required: true, default: false })
   isApproved: boolean;
 
-  @Prop({ required: true, enum: Role, default: Role.USER }) // Reference the Role enum
+  @Prop({ required: true, enum: Role, default: Role.CONSUMER }) // Reference the Role enum
   role: Role;
   //relation product
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }] })
