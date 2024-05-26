@@ -5,6 +5,13 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Product } from "./entities/product.entity";
 import { ImageService } from "src/image/image.service";
+import axios from "axios";
+import * as process from "process";
+
+const FormData = require("form-data");
+
+require("dotenv").config();
+const fs = require("fs").promises;
 
 @Injectable()
 export class ProductService {
@@ -13,25 +20,79 @@ export class ProductService {
     private readonly imageService: ImageService,
   ) {}
 
+  /**
+   * Upload Product Object into Database ! Highly Recommended for any save
+   * @param product : Product
+   *
+   */
   async add(product: Product) {
     const productDocument = new this.productModel(product);
     productDocument.id = productDocument._id.toString();
     return await productDocument.save();
   }
 
-  async create(createProductDto: CreateProductDto, userid: string) {
-    const image = createProductDto.image;
-    delete createProductDto.image;
-    let newProduct = new Product(userid);
+  /**
+   *
+   * @param createProductDto
+   * @param imageId
+   * @param userId
+   */
+  async submit(
+    createProductDto: CreateProductDto,
+    userId: string,
+    imageId?: string,
+  ) {
+    // start with getting the image
+    let imagePromise = null;
+
+    let newProduct = new Product(userId);
     newProduct = {
       ...newProduct,
       ...createProductDto,
     };
-
     let added = await this.add(newProduct);
-    this.imageService.changeImagepath(image, added.id);
-
+    if (imageId) {
+      try {
+        await fs.mkdir(`uploads/products/${added.id}`);
+        await fs.rename(
+          `uploads/temp/${imageId}.jpg`,
+          `uploads/products/${added.id}/0.jpg`,
+        );
+      } catch (e) {}
+    }
     return Product.fromDoc(added);
+  }
+
+  async discover(imageContent) {
+    const id = require("uuid").v4();
+    // TODO  : Forward Image to ML Model
+    // const imageDiscovery = await this.discoverImage(imageContent);
+    // console.log(imageDiscovery);
+    await fs.writeFile(`uploads/temp/${id}.jpg`, Buffer.from(imageContent));
+
+    return { id: id };
+  }
+
+  async discoverImage(imageBuffer) {
+    try {
+      // Create a form and append the image buffer
+      const form = new FormData();
+      form.append("file", imageBuffer, {
+        filename: "image.jpg", // Filename
+        contentType: "image/jpeg", // Mime type
+      });
+
+      const url = `${process.env.ML_MODEL_URL}/classify`; // Replace with your target URL
+      const response = await axios.post(url, form, {
+        headers: {
+          ...form.getHeaders(),
+        },
+      });
+      // Send the request
+      return response.data;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
   }
 
   async getProductOwner(productId: string) {

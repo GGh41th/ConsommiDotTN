@@ -6,7 +6,9 @@ import {
   Param,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -15,6 +17,8 @@ import { ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/user.decorator";
 import { User } from "../users/entities/user.entity";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { memoryStorage } from "multer";
 
 @ApiTags("product")
 //@Roles(['admin'])
@@ -22,13 +26,29 @@ import { User } from "../users/entities/user.entity";
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post()
+  @Post("/submit/:imageId?")
   @UseGuards(JwtAuthGuard)
-  create(
+  submit(
     @Body() createProductDto: CreateProductDto,
     @CurrentUser() user: User,
+    @Param("imageId") imageId,
   ) {
-    return this.productService.create(createProductDto, user.id);
+    return this.productService.submit(createProductDto, user.id, imageId);
+  }
+
+  @Post("/discover")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(), // Use memory storage
+    }),
+  )
+  discover(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+  ) {
+    console.log(file.buffer);
+    return this.productService.discover(file.buffer);
   }
 
   @Get()

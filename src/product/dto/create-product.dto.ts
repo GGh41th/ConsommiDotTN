@@ -25,7 +25,6 @@ export class CreateProductDto {
   @IsNotEmpty()
   isAvailable: boolean;
 
-  @IsNotEmpty()
   @IsEnum(ApproveStatus)
   status: ApproveStatus;
 
@@ -41,8 +40,12 @@ export class CreateProductDto {
   @IsNotEmpty()
   @ValidateNested()
   @Type((value: any) => {
-    console.log(JSON.stringify(value));
-    if (!DetailsDTOType[value]) throw new NotFoundException("Invalid category");
+    console.log(Object.getOwnPropertyNames(DetailsDTOType));
+    const category = value.newObject.category;
+    console.log(value.newObject.category);
+
+    if (!Object.getOwnPropertyNames(DetailsDTOType).includes(category))
+      throw new NotFoundException("Invalid category");
     return DetailsDTOType[value];
   })
   details: ClothesDetailsDto | TechDetailsDto;
