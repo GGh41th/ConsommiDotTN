@@ -26,14 +26,14 @@ import { memoryStorage } from "multer";
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post("/submit/:imageId?")
+  @Post("/create/:imageId?")
   @UseGuards(JwtAuthGuard)
   submit(
     @Body() createProductDto: CreateProductDto,
     @CurrentUser() user: User,
-    @Param("imageId") imageId,
+    @Param("imageId") imageId: string,
   ) {
-    return this.productService.submit(createProductDto, user.id, imageId);
+    return this.productService.create(createProductDto, user.id, imageId);
   }
 
   @Post("/discover")
@@ -56,23 +56,30 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @Get(":id")
-  findOne(@Param("id") id: string) {
-    return this.productService.findOne(+id);
+  @UseGuards(JwtAuthGuard)
+  @Get("property")
+  async getMyProducts(@CurrentUser() user) {
+    return this.productService.findByUserId(user.id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(":id")
+  async findOne(@CurrentUser() user: User, @Param("id") id: string) {}
 
   @Get("owner/:id")
   getProductOwner(@Param("id") id: string) {
     return this.productService.getProductOwner(id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+    return this.productService.update(id, updateProductDto);
   }
 
   @Delete(":id")
+  @UseGuards(JwtAuthGuard)
   remove(@Param("id") id: string) {
-    return this.productService.remove(+id);
+    return this.productService.remove(id);
   }
 }

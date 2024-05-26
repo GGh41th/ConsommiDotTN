@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   forwardRef,
   Inject,
   Injectable,
@@ -27,7 +28,12 @@ export class AuthService {
     const salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(userData.password, salt);
     // TODO : Need to remove the return here just for test purpose
-    // ! Warniing
+    // ! Warning
+
+    const existant = await this.usersService.findByEmail(user.email);
+    console.log(existant);
+    if (existant) throw new ConflictException("Email Already Exists");
+
     return await this.usersService.add(user);
   }
 

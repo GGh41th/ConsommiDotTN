@@ -7,6 +7,7 @@ import { Product } from "./entities/product.entity";
 import { ImageService } from "src/image/image.service";
 import axios from "axios";
 import * as process from "process";
+import { User } from "../users/entities/user.entity";
 
 const FormData = require("form-data");
 
@@ -37,7 +38,7 @@ export class ProductService {
    * @param imageId
    * @param userId
    */
-  async submit(
+  async create(
     createProductDto: CreateProductDto,
     userId: string,
     imageId?: string,
@@ -60,7 +61,7 @@ export class ProductService {
         );
       } catch (e) {}
     }
-    return Product.fromDoc(added);
+    return added.id;
   }
 
   async discover(imageContent) {
@@ -99,27 +100,53 @@ export class ProductService {
     const product = await this.productModel
       .findOne({ id: productId })
       .populate("owner")
+      .lean()
       .exec();
     if (!product) {
       throw new NotFoundException("Product not found");
     }
 
-    return product.owner;
+    return User.fromDoc(product.owner);
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll(): Promise<Product[]> {
+    return (await this.productModel.find().lean().exec()).map((doc) =>
+      Product.fromDoc(doc),
+    );
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string): Promise<Product> {
+    const product = await this.productModel.findById(id).exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    const updatedProduct = await this.productModel
+      .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .exec();
+    if (!updatedProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return updatedProduct;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string): Promise<Product> {
+    const removedProduct = await this.productModel.findByIdAndDelete(id).exec();
+    if (!removedProduct) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return removedProduct;
+  }
+
+  async findByUserId(id) {
+    return (await this.productModel.find({ owner: id }).lean().exec()).map(
+      (doc) => Product.fromDoc(doc),
+    );
   }
 }
