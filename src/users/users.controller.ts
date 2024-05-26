@@ -35,9 +35,7 @@ export class UsersController {
   }
 
   @Get("test")
-  async test() {
-    return await this.usersService.CreateFirstUser();
-  }
+  async test() {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -57,11 +55,6 @@ export class UsersController {
     transform: boolean, // Type hint for clarity
   ) {
     return this.usersService.findAll(Boolean(transform));
-  }
-
-  @Get("createFirstUser")
-  CreateFirstUser() {
-    return this.usersService.CreateFirstUser();
   }
 
   @Get(":id")

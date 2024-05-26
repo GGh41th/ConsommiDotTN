@@ -23,23 +23,6 @@ export class ProductService {
     const image = createProductDto.image;
     delete createProductDto.image;
     let newProduct = new Product(userid);
-    /*let details:
-      | ClothesDetails
-      | TechDetails
-      | JewelryDetails
-      | FurnitureDetails
-      | AnimalDetails;
-    switch (createProductDto.category) {
-      case Category.ALIMENTATION:
-        details =
-        break;
-      case Category.ANIMAL:
-      case Category.CAR:
-      case Category.CLOTHES:
-      case Category.FURNITURE:
-      case Category.JEWELRY:
-      case Category.TECH:
-    }*/
     newProduct = {
       ...newProduct,
       ...createProductDto,
