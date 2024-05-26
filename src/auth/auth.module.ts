@@ -17,7 +17,7 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
     JwtModule.register({
       global: true,
       secret: "0xDeadBeef",
-      signOptions: { expiresIn: 3600 },
+      signOptions: { expiresIn: 3600 * 24 * 7 },
     }),
     UsersModule,
   ],

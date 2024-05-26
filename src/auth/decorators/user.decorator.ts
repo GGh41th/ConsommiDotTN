@@ -9,7 +9,7 @@ export const CurrentUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     if (!request.user)
       throw new UnauthorizedException("Login first! (No user object found)");
-    const user: User = { ...request };
+    const user: User = request.user;
     return user;
   },
 );

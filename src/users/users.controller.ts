@@ -32,7 +32,11 @@ export class UsersController {
   @Get("infos")
   @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
   async whoami(@CurrentUser() user) {
-    return user;  }
+    return user; 
+  }
+
+  @Get("test")
+  async test() {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {

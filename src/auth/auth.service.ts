@@ -12,7 +12,6 @@ import { User } from "../users/entities/user.entity";
 import * as bcrypt from "bcrypt";
 import { LoginCredentialsDTO } from "../users/dto/login-credentials.dto";
 import { PayloadInterface } from "./interfaces/payload.interface";
-import { Request as ExpressRequest } from "express";
 
 @Injectable()
 export class AuthService {
@@ -21,12 +20,6 @@ export class AuthService {
     @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
-
-  async resolvePayload(req: ExpressRequest): Promise<PayloadInterface> {
-    const auth = req.headers.authorization.split(" ").pop();
-    console.log(auth);
-    return this.jwtService.decode(auth);
-  }
 
   async register(userData: CreateUserDto) {
     let user: User = new User();
