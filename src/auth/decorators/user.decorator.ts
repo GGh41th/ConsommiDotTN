@@ -1,4 +1,5 @@
 import { createParamDecorator, ExecutionContext, UnauthorizedException } from "@nestjs/common";
+import { User } from "../../users/entities/user.entity";
 
 /**
  * Gets the current user object (without his password ofc!)
@@ -8,6 +9,7 @@ export const CurrentUser = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
     if (!request.user)
       throw new UnauthorizedException("Login first! (No user object found)");
-    return request.user;
+    const user: User = { ...request };
+    return user;
   },
 );

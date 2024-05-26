@@ -47,7 +47,9 @@ export class AuthService {
         "Wrong login credentials: email not found!",
       );
     }
-    if (!bcrypt.compareSync(password, user.password))
+    console.log("retrieved user from database is: ");
+    console.log(user);
+    if (!user.password || !bcrypt.compareSync(password, user.password))
       throw new NotFoundException("Wrong login credentials: wrong password");
     const payload: PayloadInterface = {
       email: email,

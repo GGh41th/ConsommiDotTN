@@ -17,6 +17,7 @@ import { UpdateUserDto } from "./dto/update-user.dto";
 import { ApiTags } from "@nestjs/swagger";
 import { User } from "./entities/user.entity";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CurrentUser } from "../auth/decorators/user.decorator";
 
 @ApiTags("Users")
 @Controller("users")
@@ -26,6 +27,12 @@ export class UsersController {
     // @Inject(forwardRef(() => PrimalJwtGuard))
     // private readonly primalJwtGuard: PrimalJwtGuard,
   ) {}
+
+  @Get("infos")
+  @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
+  async whoami(@CurrentUser() user) {
+    return user;
+  }
 
   @Get("test")
   async test() {

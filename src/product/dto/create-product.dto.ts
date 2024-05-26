@@ -1,10 +1,15 @@
-import { NotFoundException, Optional } from '@nestjs/common';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
-import { Type } from 'class-transformer';
-import { IsDefined, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { City } from 'src/enum/city.enum';
-import { ApproveStatus } from 'src/enum/product-approve-status.enum';
-import { Category } from 'src/enum/product-category.enum';
+import { NotFoundException } from "@nestjs/common";
+import { Type } from "class-transformer";
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from "class-validator";
+import { City } from "src/enum/city.enum";
+import { ApproveStatus } from "src/enum/product-approve-status.enum";
+import { Category } from "src/enum/product-category.enum";
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -19,27 +24,26 @@ export class CreateProductDto {
   discount: number;
   @IsNotEmpty()
   isAvailable: boolean;
+
   @IsNotEmpty()
   @IsEnum(ApproveStatus)
   status: ApproveStatus;
+
   @IsNotEmpty()
   category: Category;
+
   @IsNotEmpty()
   location: City;
+
   @IsNotEmpty()
   image: string;
+
   @IsNotEmpty()
   @ValidateNested()
-  @Type((value: any) =>{
-    console.log(JSON.stringify
-    (value)
-    );
-    if (value.newObject.category==='clothes') 
-        return ClothesDetailsDto;
-    if (value.newObject.category==='tech')
-        return TechDetailsDto;
-    throw new NotFoundException('Invalid category');
-    
+  @Type((value: any) => {
+    console.log(JSON.stringify(value));
+    if (!DetailsDTOType[value]) throw new NotFoundException("Invalid category");
+    return DetailsDTOType[value];
   })
   details: ClothesDetailsDto | TechDetailsDto;
 }
@@ -118,3 +122,8 @@ export class TechDetailsDto {
   @IsNotEmpty()
   type: string;
 }
+
+const DetailsDTOType = {
+  clothes: ClothesDetailsDto,
+  tech: TechDetailsDto,
+};

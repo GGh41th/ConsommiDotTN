@@ -186,6 +186,22 @@ function loadUser() {
     })
     .add();
 
+  new APIEndpoint()
+    .done()
+    .method("get")
+    .url("/users/infos")
+    .urlDesc("Returns all users infos")
+    .outDesc("The Result should be all the users infos")
+    .outObj({
+      email: "omar.mejdi@insat.com",
+      name: "omar",
+      lastName: "mejdi",
+      isApproved: false,
+      role: "user",
+      products: [],
+      id: "665292e125aec2506e246201",
+    })
+    .add();
   apisUser = [...apis];
   apis = [];
 }
