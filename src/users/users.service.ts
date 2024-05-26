@@ -49,6 +49,7 @@ export class UsersService {
     return user;
   }
 
+  
   remove(id: string) {
     //verify the user exist
     this.verifyUserExsitance(id);

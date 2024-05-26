@@ -11,6 +11,7 @@ import { ImageModule } from "./image/image.module";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { MorganInterceptor, MorganModule } from "nest-morgan";
 import { ParseBoolPipe } from "@nestjs/common/pipes";
+import { ConversationModule } from './conversation/conversation.module';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ dotenv.config();
     AuthModule,
     ImageModule,
     MorganModule,
+    ConversationModule,
   ],
   controllers: [AppController],
   providers: [

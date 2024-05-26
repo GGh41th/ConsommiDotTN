@@ -18,6 +18,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { User } from "./entities/user.entity";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/user.decorator";
+import e from "express";
 
 @ApiTags("Users")
 @Controller("users")
@@ -31,11 +32,7 @@ export class UsersController {
   @Get("infos")
   @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
   async whoami(@CurrentUser() user) {
-    return user;
-  }
-
-  @Get("test")
-  async test() {}
+    return user;  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -56,6 +53,8 @@ export class UsersController {
   ) {
     return this.usersService.findAll(Boolean(transform));
   }
+
+ 
 
   @Get(":id")
   findOne(@Param("id") id: string) {
