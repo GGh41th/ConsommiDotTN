@@ -7,6 +7,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/user.decorator';
 import { WsJwtGuard } from 'src/auth/guards/ws-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { User } from 'src/users/entities/user.entity';
 @ApiTags("conversation")
 @Controller("conversation")
 export class ConversationController {
@@ -21,6 +22,20 @@ export class ConversationController {
     console.log('get conversation');
     return this.conversationService.getConversation(productId, user);
   }
+
+  //get conversations 
+  @Get('all/:productId')
+  @UseGuards(JwtAuthGuard)
+  getConversations(
+    @CurrentUser() user:User ,
+    @Param('productId') productId: string
+  ) {
+    console.log('get conversation');
+    return this.conversationService.getConversations(productId, user.id);
+  }
+
+
+
 
   
 
