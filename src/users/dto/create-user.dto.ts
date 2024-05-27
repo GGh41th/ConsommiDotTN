@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, MaxLength, maxLength } from "class-validator";
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -11,11 +11,13 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
   @IsOptional()
+  @MaxLength(8, { message: 'Phone number is too long. Maximum length is 8 characters.' })
   phone: string;
   @IsOptional()
   city: string;
   @IsOptional()
   street: string;
   @IsOptional()
+  
   postalCode: string;
 }

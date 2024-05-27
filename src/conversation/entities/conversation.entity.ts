@@ -17,17 +17,17 @@ export class Conversation  {
     id: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" , required: true })
-    client: User;
+    client: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true })
-    product: Product;
+    product: string;
 
 
     @Prop({ type: Date, default: Date.now })
     createdAt: Date;
 
     @Prop({ type:[{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],required:true})
-    messages: Message[];
+    messages: string[];
 
 
 }

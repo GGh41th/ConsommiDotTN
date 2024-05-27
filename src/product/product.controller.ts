@@ -20,8 +20,6 @@ import { CurrentUser } from "../auth/decorators/user.decorator";
 import { User } from "../users/entities/user.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
-import { SubscriptionService } from "src/subscription/subscription.service";
-import { SseService } from "src/sse/see.service";
 
 @ApiTags("product")
 //@Roles(['admin'])
@@ -29,8 +27,6 @@ import { SseService } from "src/sse/see.service";
 export class ProductController {
   constructor(
     private readonly productService: ProductService,
-    private readonly sseService: SseService,
-    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   @Post("/create/:imageId?")

@@ -4,6 +4,7 @@ import { ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { CurrentUser } from "./auth/decorators/user.decorator";
 import * as fs from "fs";
+import { WsJwtGuard } from "./auth/guards/ws-auth.guard";
 
 @Controller()
 @ApiTags("Genral")

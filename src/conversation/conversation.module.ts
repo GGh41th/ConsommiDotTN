@@ -13,6 +13,7 @@ import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
+    ProductModule,
     MongooseModule.forFeature([
       {
         name: 'Conversation',
@@ -28,7 +29,7 @@ import { UsersModule } from 'src/users/users.module';
     ]),  
   ],
   controllers: [ConversationController],
-  providers: [ChatGateway ,ConversationService, ],
+  providers: [ChatGateway ,ConversationService ],
   
 })
 export class ConversationModule {}
