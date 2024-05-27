@@ -23,6 +23,11 @@ async function bootstrap() {
   }));
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("api", app, document);
+  const corsOptions = {
+    origin: ['http://localhost:3001'],
+    optionsSuccessStatus: 200
+    }
+    app.enableCors(corsOptions);
   await app.listen(PORT);
   log("App is runnning at: http://localhost:" + PORT);
 }
