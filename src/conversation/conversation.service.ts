@@ -110,7 +110,7 @@ export class ConversationService {
       throw new NotFoundException('Product not found');
     }
     const conversations = await this.conversationModel.find({ product: productId }).populate('client').exec();
-    const list=conversations.map(async (conversation) => {
+    const list=await Promise.all(conversations.map(async (conversation) => {
       const user = await this.userService.findOne(conversation.client);
       return { "conversationId": conversation.id,
                "client":
@@ -124,7 +124,7 @@ export class ConversationService {
                }
                ,"messagesSize":conversation.messages.length};
     }
-    );
+    ));
     return list;
     
   }
