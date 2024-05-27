@@ -78,5 +78,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       client.leave(conversationBody.conversationId);
       console.log(`Client ${client.id} left conversation ${conversationBody.conversationId}`);
     }
+
+    
   
 }

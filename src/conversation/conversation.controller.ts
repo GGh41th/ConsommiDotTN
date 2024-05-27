@@ -12,7 +12,14 @@ import { User } from 'src/users/entities/user.entity';
 @Controller("conversation")
 export class ConversationController {
   constructor(private readonly conversationService: ConversationService) {}
+//get all conversations of a user as a client
+  @Get('all')
+  @UseGuards(JwtAuthGuard)
+  getAllConversations(@CurrentUser() user: User) {
+    return this.conversationService.getAllConversations(user.id);
+  }
 
+  
   @Get('/:productId')
   @UseGuards(JwtAuthGuard)
   getConversation(
@@ -23,7 +30,7 @@ export class ConversationController {
     return this.conversationService.getConversation(productId, user);
   }
 
-  //get conversations 
+  //get conversations of a product
   @Get('all/:productId')
   @UseGuards(JwtAuthGuard)
   getConversations(
@@ -33,6 +40,8 @@ export class ConversationController {
     console.log('get conversation');
     return this.conversationService.getConversations(productId, user.id);
   }
+
+  
 
 
 

@@ -13,6 +13,7 @@ import { MorganInterceptor, MorganModule } from "nest-morgan";
 import { ParseBoolPipe } from "@nestjs/common/pipes";
 import { ConversationModule } from './conversation/conversation.module';
 import { SocketModule } from './socket/socket.module';
+import { ProductHistoryModule } from './product-history/product-history.module';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ dotenv.config();
     MorganModule,
     ConversationModule,
     SocketModule,
+    ProductHistoryModule,
   ],
   controllers: [AppController],
   providers: [

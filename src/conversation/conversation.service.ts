@@ -42,12 +42,12 @@ export class ConversationService {
 
     await this.addMessage(message);
 
-    conversation.messages.push(message.id);
+    conversation.messages.push(message._id.toString());
     await this.conversationModel.updateOne({ id: conversation.id }, conversation);
 
     return message;
   }
-
+ //get conversation of a product
   async getConversation(product: string, user: any) {
     // Search for conversation with product ID and user ID
     let conversation = await this.conversationModel
@@ -98,7 +98,14 @@ export class ConversationService {
     }
   
     const messages = await this.messageModel.find({ conversation: conversationId }).exec();
-    return { conversation, messages };
+    //reduce the messages to the required format
+     const result =messages.map((message) => ({
+      "id": message.id,
+      "sender": message.sender,
+      "content": message.content,
+      "createdAt": message.createdAt
+    }));
+    return { "messages":result };
   }
 
   async getConversations(productId: string, userId: string) {
@@ -107,7 +114,7 @@ export class ConversationService {
       throw new NotFoundException('Product not found');
     }
     if(product.owner.toString() !== userId){
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('User not owner of product');
     }
     const conversations = await this.conversationModel.find({ product: productId }).populate('client').exec();
     const list=await Promise.all(conversations.map(async (conversation) => {
@@ -127,6 +134,26 @@ export class ConversationService {
     ));
     return list;
     
+  }
+  //get all conversations of a user as client
+  async getAllConversations(userId: string) {
+    const conversations = await this.conversationModel.find({ client: userId }).populate('product').exec();
+    const list=await Promise.all(conversations.map(async (conversation) => {
+      const prod = await this.productService.findOne(conversation.product);
+      return { "conversationId": conversation.id,
+               "product":
+               {
+                  "id": prod.id,
+                  "name": prod.name,
+                  "description": prod.description,
+                  "price": prod.price,
+                  "owner": prod.owner
+
+               }
+               ,"messagesSize":conversation.messages.length};
+    }
+    ));
+    return list;
   }
   
 
