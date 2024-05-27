@@ -123,7 +123,6 @@ export class ConversationService {
 
                }
                ,"messagesSize":conversation.messages.length};
-
     }
     );
     return list;
