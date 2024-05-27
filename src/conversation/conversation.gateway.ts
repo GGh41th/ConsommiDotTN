@@ -1,5 +1,5 @@
 
-import {
+/*import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
@@ -49,12 +49,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const user = this.userMap.get(client.id);
     if (!user) {
       client.emit('error', 'Unauthorized: User information not found');
+      console.log("Unauthorized is sent to client: User information not found");
       return;
     }
 
     const room = messageDto.conversationId.toString();
     const rooms = Array.from(client.rooms);
-
+    console.log('rooms',rooms);
     if (!rooms.includes(room)) {
       client.emit('error', 'Unauthorized: You are not in this conversation');
       console.log("Unauthorized is sent to client: Not in room");
@@ -62,6 +63,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     
     const message = await this.conversationService.sendMessage(messageDto, user);
+    console.log('message',message," is sent");
     this.server.to(messageDto.conversationId).emit('message', message);
     return message;
   }
@@ -78,6 +80,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     this.userMap.set(client.id, client.user.id);
     client.join(conversationBody.conversationId);
+    console.log(client.rooms)
     console.log(`Client ${client.id} joined conversation ${conversationBody.conversationId}`);
     this.server.emit('joined', "Hello everhoenr ererere");
   }
@@ -92,3 +95,4 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   
 }
+*/

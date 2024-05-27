@@ -12,6 +12,7 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { MorganInterceptor, MorganModule } from "nest-morgan";
 import { ParseBoolPipe } from "@nestjs/common/pipes";
 import { ConversationModule } from './conversation/conversation.module';
+import { SocketModule } from './socket/socket.module';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ dotenv.config();
     ImageModule,
     MorganModule,
     ConversationModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [

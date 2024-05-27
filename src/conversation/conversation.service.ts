@@ -5,7 +5,7 @@ import { Conversation } from './entities/conversation.entity';
 import { Message } from './entities/message.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { CreateMessageDto } from './dto/send-message.dto';
-import { ChatGateway } from './conversation.gateway';
+//import { ChatGateway } from './conversation.gateway';
 import { UsersService } from 'src/users/users.service';
 import { ProductService } from 'src/product/product.service';
 
@@ -57,19 +57,19 @@ export class ConversationService {
     if (!conversation) {
       console.log('conversation not found');
       // If not found, create a new conversation
-      const newconv=await this.conversationModel.create({
+      var newconv= new this.conversationModel({
         client: user.id,
         product,
         messages: []
       });
-      await this.addConversation(newconv);
-      
-      return await  this.getMessages(newconv.id, user);
+
+      newconv=await this.addConversation(newconv);
+      return await  this.getMessages(newconv._id.toString(), user);
       
     }
   const prod  = await this.productService.findOne(product);
     // Check if the user is either the client or the owner of the product
-    if (String(conversation.client) !== user.id && prod.owner!== user.id) {
+    if (conversation.client.toString() !== user.id && prod.owner.toString()!== user.id) {
       throw new NotFoundException('Conversation not found');
     }
   
@@ -83,17 +83,38 @@ export class ConversationService {
       .exec();
   
     if (!conversation) {
-      throw new NotFoundException('Conversation not found');
+      throw new NotFoundException('Conversation not foundin meessage');
     }
     const prod  = await this.productService.findOne(conversation.product);
+    console.log('prod',prod.id);
+    console.log('user',user.id);
+    console.log('conversation',conversation.client.toString());
 
     // Check if the user is either the client or the owner of the product
-    if (String(conversation.client) !== user.id && prod.owner.toString() !== user.id) {
-      throw new NotFoundException('Conversation not found');
+    if (conversation.client.toString() !== user.id && prod.owner.toString() !== user.id) {
+      throw new NotFoundException('not part of conversation');
     }
   
     const messages = await this.messageModel.find({ conversation: conversationId }).exec();
     return { conversation, messages };
+  }
+
+  async getConversations(productId: string, userId: string) {
+    const product = await this.productService.findOne(productId);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    if(product.owner.toString() !== userId){
+      throw new NotFoundException('Product not found');
+    }
+    const conversations = await this.conversationModel.find({ product: productId }).populate('client').exec();
+    const list=conversations.map(async (conversation) => {
+      return { "conversationId": conversation.id, "client": conversation.client,"messagesSize":conversation.messages.length};
+
+    }
+    );
+    return list;
+    
   }
   
 
@@ -122,8 +143,10 @@ export class ConversationService {
     }
 
     const prod  = await this.productService.findOne(conversation.product);
-
-    if(String(conversation.client) !== userId && prod.owner !== userId){
+    console.log('prod',prod.owner.toString());
+    console.log('user',userId);
+    console.log('conversation',conversation.client.toString());
+    if(conversation.client.toString() !== userId && prod.owner.toString() !== userId){
       console.log('user not part of conversation');
       return false;
     }
