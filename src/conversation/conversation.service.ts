@@ -15,7 +15,9 @@ export class ConversationService {
   constructor(
     @InjectModel('Conversation') private readonly conversationModel: Model<Conversation>,
     @InjectModel('Message') private readonly messageModel: Model<Message>,
-    private readonly productService  : ProductService
+    
+    private readonly productService  : ProductService,
+    private readonly userService: UsersService
     
   ) {}
 
@@ -109,7 +111,18 @@ export class ConversationService {
     }
     const conversations = await this.conversationModel.find({ product: productId }).populate('client').exec();
     const list=conversations.map(async (conversation) => {
-      return { "conversationId": conversation.id, "client": conversation.client,"messagesSize":conversation.messages.length};
+      const user = await this.userService.findOne(conversation.client);
+      return { "conversationId": conversation.id,
+               "client":
+               {
+                  "id": user.id,
+                  "name": user.name,
+                  "lastname": user.lastName,
+                  "email": user.email,
+                  "phone": user.phone
+
+               }
+               ,"messagesSize":conversation.messages.length};
 
     }
     );

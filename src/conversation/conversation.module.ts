@@ -29,6 +29,7 @@ import { SocketModule } from 'src/socket/socket.module';
       
      
     ]), 
+    UsersModule,
      
   ],
   controllers: [ConversationController],
