@@ -26,9 +26,10 @@ export class ConversationService {
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
+    const prod  = await this.productService.findOne(conversation.product);
 
     // Determine if the sender is the seller or the client
-    const senderIsSeller = String(conversation.product) === userId;
+    const senderIsSeller = prod.owner.toString() === userId;
 
     const message = new this.messageModel({
       sender: senderIsSeller,
@@ -78,16 +79,16 @@ export class ConversationService {
   async getMessages(conversationId: string, user: any) {
     const conversation = await this.conversationModel
       .findById(conversationId)
-      .populate('product')
       .lean()
       .exec();
   
     if (!conversation) {
       throw new NotFoundException('Conversation not found');
     }
-    
+    const prod  = await this.productService.findOne(conversation.product);
+
     // Check if the user is either the client or the owner of the product
-    if (String(conversation.client) !== user.id && String(conversation.product) !== user.id) {
+    if (String(conversation.client) !== user.id && prod.owner.toString() !== user.id) {
       throw new NotFoundException('Conversation not found');
     }
   
