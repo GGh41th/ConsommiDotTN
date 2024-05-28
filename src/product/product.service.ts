@@ -8,6 +8,8 @@ import { ImageService } from "src/image/image.service";
 import axios from "axios";
 import * as process from "process";
 import { User } from "../users/entities/user.entity";
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UpdateProductHistoryDto } from "src/product-history/dto/update-product-history.dto";
 
 const FormData = require("form-data");
 
@@ -19,6 +21,9 @@ export class ProductService {
   constructor(
     @InjectModel("Product") private readonly productModel: Model<Product>,
     private readonly imageService: ImageService,
+    private readonly eventEmitter: EventEmitter2,
+    
+
   ) {}
 
   /**
@@ -127,12 +132,19 @@ export class ProductService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
+    //get the product
+    const product = await this.productModel.findById(id).exec();
     const updatedProduct = await this.productModel
       .findByIdAndUpdate(id, updateProductDto, { new: true })
       .exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
+    //emit the event
+    const oldDto=new UpdateProductHistoryDto(product.price,product.discount,product.isAvailable);
+    const newDto=new UpdateProductHistoryDto(updatedProduct.price,updatedProduct.discount,updatedProduct.isAvailable);
+    this.eventEmitter.emit('cvupdate',oldDto,newDto,product.id,product.name);
+
     return updatedProduct;
   }
 

@@ -79,6 +79,11 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
       console.log(`Client ${client.id} left conversation ${conversationBody.conversationId}`);
     }
 
+    @SubscribeMessage('listenUpdate')
+    async handleListenUpdate(@MessageBody() ProductId,@ConnectedSocket() client: any){
+      client.join(ProductId);
+    }
+
     
   
 }

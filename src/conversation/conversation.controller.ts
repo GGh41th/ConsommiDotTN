@@ -30,6 +30,15 @@ export class ConversationController {
     return this.conversationService.getConversation(productId, user);
   }
 
+  @Get('messages/:conversationId')
+  @UseGuards(JwtAuthGuard)
+  getMessages(
+    @CurrentUser() user: any,
+    @Param('conversationId') conversationId: string
+  ) {
+    return this.conversationService.getMessages(conversationId, user);
+  }
+
   //get conversations of a product
   @Get('all/:productId')
   @UseGuards(JwtAuthGuard)

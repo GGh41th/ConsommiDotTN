@@ -6,6 +6,8 @@ import { ProductSchema } from 'src/schemas/Product.schema';
 import { ImageModule } from 'src/image/image.module';
 import { Subscription, SubscriptionSchema } from 'src/subscription/entities/subscription.entity';
 import { SubscriptionService } from 'src/subscription/subscription.service';
+import { SocketModule } from 'src/socket/socket.module';
+import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -24,9 +26,13 @@ import { SubscriptionService } from 'src/subscription/subscription.service';
       },
     ]),
     ImageModule,
+    EventEmitterModule.forRoot(),
+    
+
+    
   ],
   controllers: [ProductController],
-  providers: [ProductService, SubscriptionService],
+  providers: [ProductService],
   exports: [ProductService],
 })
 export class ProductModule {}

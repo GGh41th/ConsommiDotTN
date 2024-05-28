@@ -74,8 +74,8 @@ export class ConversationService {
     if (conversation.client.toString() !== user.id && prod.owner.toString()!== user.id) {
       throw new NotFoundException('Conversation not found');
     }
-  
-    return this.getMessages(conversation.id, user);
+    const messages=await this.getMessages(conversation.id, user);
+    return { "conversationId": conversation.id,...messages}
   }
   
   async getMessages(conversationId: string, user: any) {

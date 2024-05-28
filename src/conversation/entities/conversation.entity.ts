@@ -7,11 +7,13 @@ import { Message } from "./message.entity";
 
 @Schema()
 export class Conversation  {
-    static fromDoc(doc: any): User {
-       const { _id = null, __v = null, ...user } = { ...doc };
+    static fromDoc(doc: any): Conversation {
+       const { _id = null, __v = null, ...conversation } = { ...doc };
     
-       return user;
+       return conversation
+       ;
      }
+     
     
     @Prop()
     id: string;
