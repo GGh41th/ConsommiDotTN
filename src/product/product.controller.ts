@@ -1,18 +1,15 @@
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
+  NotFoundException,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
-  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
-  NotFoundException,
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { CreateProductDto } from "./dto/create-product.dto";
@@ -28,9 +25,7 @@ import { memoryStorage } from "multer";
 //@Roles(['admin'])
 @Controller("product")
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   @Post("/create/:imageId?")
   @UseGuards(JwtAuthGuard)
@@ -65,16 +60,8 @@ export class ProductController {
   @UseGuards(JwtAuthGuard)
   @Get("property")
   async getMyProducts(@CurrentUser() user) {
-    return this.productService.findByUserId(user.id);}
-  @Get(":id")
-  async findOne(@Param("id") id: string) {
-    const product = await this.productService.findOne(id);
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
-    return product;
+    return this.productService.findByUserId(user.id);
   }
-  
 
   @Get("owner/:id")
   async getProductOwner(@Param("id") id: string) {

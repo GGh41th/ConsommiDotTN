@@ -9,6 +9,7 @@ import axios from "axios";
 import * as process from "process";
 import { User } from "../users/entities/user.entity";
 import { EventEmitter2 } from "@nestjs/event-emitter";
+import { UpdateProductHistoryDto } from "../product-history/dto/update-product-history.dto";
 
 const FormData = require("form-data");
 
@@ -138,9 +139,23 @@ export class ProductService {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
     //emit the event
-    const oldDto=new UpdateProductHistoryDto(product.price,product.discount,product.isAvailable);
-    const newDto=new UpdateProductHistoryDto(updatedProduct.price,updatedProduct.discount,updatedProduct.isAvailable);
-    this.eventEmitter.emit('cvupdate',oldDto,newDto,product.id,product.name);
+    const oldDto = new UpdateProductHistoryDto(
+      product.price,
+      product.discount,
+      product.isAvailable,
+    );
+    const newDto = new UpdateProductHistoryDto(
+      updatedProduct.price,
+      updatedProduct.discount,
+      updatedProduct.isAvailable,
+    );
+    this.eventEmitter.emit(
+      "cvupdate",
+      oldDto,
+      newDto,
+      product.id,
+      product.name,
+    );
 
     return updatedProduct;
   }
