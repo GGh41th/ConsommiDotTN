@@ -1,12 +1,15 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,6 +29,21 @@ import { memoryStorage } from "multer";
 @Controller("product")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Get("filter")
+  async getFiltered(
+    @Query("category") category: string,
+    @Query("page", new DefaultValuePipe(1), ParseIntPipe) pageNumber: number,
+    @Query("pageSize", new DefaultValuePipe(21), ParseIntPipe) pageSize: number,
+    @Query("sortBy") sortBy: string,
+  ) {
+    return this.productService.getFiltered(
+      category,
+      pageNumber,
+      sortBy,
+      pageSize,
+    );
+  }
 
   @Post("/create/:imageId?")
   @UseGuards(JwtAuthGuard)

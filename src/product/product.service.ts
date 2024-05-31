@@ -99,6 +99,8 @@ export class ProductService {
     }
   }
 
+  async addImage(imageBuffer) {}
+
   async getProductOwner(productId: string) {
     const product = await this.productModel
       .findOne({ id: productId })
