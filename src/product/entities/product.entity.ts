@@ -18,6 +18,10 @@ export class Product {
     return prod;
   }
 
+  static fromArray(docs: any[]): Product[] {
+    return docs.map((doc) => Product.fromDoc(doc));
+  }
+
   // static detailsFromDTO(
   //   productDTO: CreateProductDto,
   // ): TechDetails | ClothesDetails {

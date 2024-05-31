@@ -8,8 +8,7 @@ import { ImageService } from "src/image/image.service";
 import axios from "axios";
 import * as process from "process";
 import { User } from "../users/entities/user.entity";
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { UpdateProductHistoryDto } from "src/product-history/dto/update-product-history.dto";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 
 const FormData = require("form-data");
 
@@ -22,8 +21,6 @@ export class ProductService {
     @InjectModel("Product") private readonly productModel: Model<Product>,
     private readonly imageService: ImageService,
     private readonly eventEmitter: EventEmitter2,
-    
-
   ) {}
 
   /**
@@ -155,6 +152,30 @@ export class ProductService {
     }
     return removedProduct;
   }
+
+  async getFiltered(
+    category: string,
+    pageNumber: number = 1,
+    sortBy: string,
+    pageSize = 21,
+  ) {
+    const query = this.productModel;
+    const filter: any = {};
+    if (category) filter.category = category;
+
+    if (!pageNumber && pageNumber < 1) pageNumber = 1;
+
+    const results = await query
+      .find(filter)
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .lean()
+      .exec();
+
+    return Product.fromArray(results);
+  }
+
+  async getAllCategories() {}
 
   async findByUserId(id) {
     return (await this.productModel.find({ owner: id }).lean().exec()).map(

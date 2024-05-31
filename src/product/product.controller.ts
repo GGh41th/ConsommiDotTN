@@ -1,11 +1,14 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -88,5 +91,14 @@ export class ProductController {
   @UseGuards(JwtAuthGuard)
   remove(@Param("id") id: string) {
     return this.productService.remove(id);
+  }
+
+  @Get(":id")
+  async findOne(@Param("id") id: string) {
+    const product = await this.productService.findOne(id);
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    return product;
   }
 }
