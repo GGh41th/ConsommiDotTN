@@ -23,6 +23,7 @@ import { CurrentUser } from "../auth/decorators/user.decorator";
 import { User } from "../users/entities/user.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
+import { Category } from "../enum/product-category.enum";
 
 @ApiTags("product")
 //@Roles(['admin'])
@@ -43,6 +44,11 @@ export class ProductController {
       sortBy,
       pageSize,
     );
+  }
+
+  @Get("categories")
+  async getAllCategories() {
+    return Object.values(Category);
   }
 
   @Post("/create/:imageId?")
