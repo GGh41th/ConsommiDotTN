@@ -106,4 +106,8 @@ export class ProductController {
     }
     return product;
   }
+  @Get('search/:name')
+  async search(@Param('name') name: string) {
+    return this.productService.searchByName(name);
+  }
 }

@@ -199,4 +199,16 @@ export class ProductService {
       (doc) => Product.fromDoc(doc),
     );
   }
+   /**
+   * Search for products by name.
+   * @param name The name of the product to search for.
+   */
+   async searchByName(name: string): Promise<Product[]> {
+    const products = await this.productModel
+      .find({ name: { $regex: name, $options: 'i' } })
+      .lean()
+      .exec();
+
+    return products.map((doc) => Product.fromDoc(doc));
+  }
 }
