@@ -1,4 +1,11 @@
-import { IsEmail, IsNotEmpty, IsOptional, MaxLength, maxLength } from "class-validator";
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  MaxLength,
+} from "class-validator";
+import { City } from "../../enum/city.enum";
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -11,13 +18,15 @@ export class CreateUserDto {
   @IsNotEmpty()
   lastName: string;
   @IsOptional()
-  @MaxLength(8, { message: 'Phone number is too long. Maximum length is 8 characters.' })
+  @MaxLength(8, {
+    message: "Phone number is too long. Maximum length is 8 characters.",
+  })
   phone: string;
   @IsOptional()
-  city: string;
+  @IsEnum(City)
+  city: City;
   @IsOptional()
   street: string;
   @IsOptional()
-  
   postalCode: string;
 }

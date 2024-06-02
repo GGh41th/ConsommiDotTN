@@ -18,7 +18,6 @@ import { ApiTags } from "@nestjs/swagger";
 import { User } from "./entities/user.entity";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { CurrentUser } from "../auth/decorators/user.decorator";
-import e from "express";
 
 @ApiTags("Users")
 @Controller("users")
@@ -32,7 +31,16 @@ export class UsersController {
   @Get("infos")
   @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
   async whoami(@CurrentUser() user) {
-    return user; 
+    return user;
+  }
+
+  @Patch("infos")
+  @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
+  async changeInfos(
+    @CurrentUser() user: User,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.update(user.id, updateUserDto);
   }
 
   @Get("test")
@@ -58,8 +66,6 @@ export class UsersController {
     return this.usersService.findAll(Boolean(transform));
   }
 
- 
-
   @Get(":id")
   findOne(@Param("id") id: string) {
     //where id is the user id
@@ -67,8 +73,9 @@ export class UsersController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
+    await this.usersService.update(id, updateUserDto);
+    return User.clean(await this.usersService.findOne(id));
   }
 
   @Delete(":id")

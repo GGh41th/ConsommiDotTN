@@ -15,6 +15,11 @@ export class User {
     return user;
   }
 
+  static clean(user: User) {
+    const { password, ...clened } = { ...user };
+    return clened;
+  }
+
   @Prop()
   id: string;
   @Prop({ required: true })

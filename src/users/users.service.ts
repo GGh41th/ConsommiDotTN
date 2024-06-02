@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "./entities/user.entity";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class UsersService {
@@ -40,26 +45,28 @@ export class UsersService {
     return User.fromDoc(userDoc);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     //verify the user exist
-    this.verifyUserExsitance(id);
-
-    const user = this.userModel.findOneAndUpdate({ id: id }, updateUserDto);
-
-    return user;
+    await this.verifyUserExsitance(id);
+    if (updateUserDto.password) {
+      const salt = await bcrypt.genSalt();
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
+    }
+    return await this.userModel
+      .findOneAndUpdate({ id: id }, updateUserDto)
+      .lean()
+      .exec();
   }
 
-  
-  remove(id: string) {
+  async remove(id: string) {
     //verify the user exist
-    this.verifyUserExsitance(id);
-    //delete the user
-    const user = this.userModel.findOneAndUpdate({ id: id });
-    return user;
+    await this.verifyUserExsitance(id);
+
+    return await this.userModel.findOneAndDelete({ id: id }).lean().exec();
   }
 
-  async verifyUserExsitance(id: string): Promise<boolean> {
-    const finduser = await this.userModel.findOne({ id: id });
-    return Boolean(finduser);
+  async verifyUserExsitance(id: string): Promise<void> {
+    const finduser: User = await this.findOne(id);
+    if (!Boolean(finduser)) throw new NotFoundException("user not found");
   }
 }
