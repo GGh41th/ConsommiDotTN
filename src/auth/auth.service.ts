@@ -31,8 +31,7 @@ export class AuthService {
     // ! Warning
 
     const existant = await this.usersService.findByEmail(user.email);
-    console.log(existant);
-    if (existant) throw new ConflictException("Email Already Exists");
+    if (existant && Object.keys(existant).length>0) throw new ConflictException("Email Already Exists");
 
     return await this.usersService.add(user);
   }

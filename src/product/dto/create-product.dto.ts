@@ -1,4 +1,3 @@
-import { NotFoundException } from "@nestjs/common";
 import { Type } from "class-transformer";
 import {
   IsEnum,
@@ -8,8 +7,15 @@ import {
   ValidateNested,
 } from "class-validator";
 import { City } from "src/enum/city.enum";
-import { ApproveStatus } from "src/enum/product-approve-status.enum";
 import { Category } from "src/enum/product-category.enum";
+import {
+  AnimalDetails,
+  ClothesDetails,
+  FurnitureDetails,
+  JewelryDetails,
+  TechDetails,
+} from "../entities/product.entity";
+import { BadRequestException } from "@nestjs/common";
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -25,30 +31,37 @@ export class CreateProductDto {
   @IsNotEmpty()
   isAvailable: boolean;
 
-  @IsEnum(ApproveStatus)
-  status: ApproveStatus;
-
   @IsNotEmpty()
   category: Category;
 
   @IsNotEmpty()
+  @IsEnum(City)
   location: City;
 
   @IsNotEmpty()
-  image: string;
-
-  @IsNotEmpty()
   @ValidateNested()
-  @Type((value: any) => {
-    console.log(Object.getOwnPropertyNames(DetailsDTOType));
-    const category = value.newObject.category;
-    console.log(value.newObject.category);
-
-    if (!Object.getOwnPropertyNames(DetailsDTOType).includes(category))
-      throw new NotFoundException("Invalid category");
-    return DetailsDTOType[value];
+  @Type((obj: any) => {
+    switch (obj.object.category) {
+      case Category.TECH:
+        return TechDetails;
+      case Category.JEWELRY:
+        return JewelryDetails;
+      case Category.CLOTHES:
+        return ClothesDetails;
+      case Category.FURNITURE:
+        return FurnitureDetails;
+      case Category.ANIMAL:
+        return AnimalDetails;
+      default:
+        throw new BadRequestException("infound category");
+    }
   })
-  details: ClothesDetailsDto | TechDetailsDto;
+  details:
+    | TechDetails
+    | JewelryDetails
+    | ClothesDetails
+    | FurnitureDetails
+    | AnimalDetails;
 }
 
 export class ClothesDetailsDto {

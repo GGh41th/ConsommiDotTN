@@ -1,13 +1,16 @@
-import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { ProductService } from './product.service';
-import { ProductController } from './product.controller';
-import { ProductSchema } from 'src/schemas/Product.schema';
-import { ImageModule } from 'src/image/image.module';
-import { Subscription, SubscriptionSchema } from 'src/subscription/entities/subscription.entity';
-import { SubscriptionService } from 'src/subscription/subscription.service';
-import { SocketModule } from 'src/socket/socket.module';
-import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { ProductService } from "./product.service";
+import { ProductController } from "./product.controller";
+import { ProductSchema } from "src/schemas/Product.schema";
+import { ImageModule } from "src/image/image.module";
+import {
+  Subscription,
+  SubscriptionSchema,
+} from "src/subscription/entities/subscription.entity";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { OwnerGuard } from "./guards/owner.guard";
+import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
 
 @Module({
   imports: [
@@ -15,10 +18,7 @@ import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
       {
         name: "Product",
         schema: ProductSchema,
-        discriminators: [
-          { name: "Clothes", schema: ProductSchema },
-          { name: "Tech", schema: ProductSchema },
-        ],
+       
       },
       {
         name: Subscription.name, // Use the name property of the Subscription class
@@ -27,12 +27,9 @@ import { EventEmitter2, EventEmitterModule } from '@nestjs/event-emitter';
     ]),
     ImageModule,
     EventEmitterModule.forRoot(),
-    
-
-    
   ],
   controllers: [ProductController],
-  providers: [ProductService],
+  providers: [ProductService, ProductByIdPipe],
   exports: [ProductService],
 })
 export class ProductModule {}

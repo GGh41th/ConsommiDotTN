@@ -21,11 +21,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         "user provided by the token is not found",
       );
     const { password, ...result } = user;
-    console.log("We are at the strategy");
-    console.log("and we have removed the : ");
-    console.log(password);
-    console.log("and we have still left with");
-    console.log(result);
+    // console.log("We are at the strategy");
+    // console.log("and we have removed the : ");
+    // console.log(password);
+    // console.log("and we have still left with");
+    // console.log(result);
     return result;
   }
 }

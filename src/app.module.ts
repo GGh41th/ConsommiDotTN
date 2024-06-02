@@ -11,16 +11,20 @@ import { ImageModule } from "./image/image.module";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { MorganInterceptor, MorganModule } from "nest-morgan";
 import { ParseBoolPipe } from "@nestjs/common/pipes";
-import { ConversationModule } from './conversation/conversation.module';
-import { SocketModule } from './socket/socket.module';
-import { ProductHistoryModule } from './product-history/product-history.module';
+import { ConversationModule } from "./conversation/conversation.module";
+import { SocketModule } from "./socket/socket.module";
+import { ProductHistoryModule } from "./product-history/product-history.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
 
 dotenv.config();
 
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      process.env.MONGO_URI    ),
+    ServeStaticModule.forRoot({
+      rootPath: "uploads",
+      serveRoot: "/uploads", // This will serve files from /uploads URL path
+    }),
+    MongooseModule.forRoot(process.env.MONGO_URI),
 
     ConfigModule.forRoot({ isGlobal: true }),
     UsersModule,

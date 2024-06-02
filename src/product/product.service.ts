@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { InjectModel } from "@nestjs/mongoose";
@@ -35,12 +39,10 @@ export class ProductService {
     return await productDocument.save();
   }
 
-  /**
-   *
-   * @param createProductDto
-   * @param imageId
-   * @param userId
-   */
+  pathFromId(id: string, index: number): string {
+    return `uploads/products/${id}/${index}.jpg`;
+  }
+
   async create(
     createProductDto: CreateProductDto,
     userId: string,
@@ -54,16 +56,23 @@ export class ProductService {
       ...newProduct,
       ...createProductDto,
     };
-    let added = await this.add(newProduct);
+    const productDocument = new this.productModel(newProduct);
+    productDocument.id = productDocument._id.toString();
+    const added = await productDocument.save();
+    console.log(imageId);
     if (imageId) {
       try {
         await fs.mkdir(`uploads/products/${added.id}`);
         await fs.rename(
           `uploads/temp/${imageId}.jpg`,
-          `uploads/products/${added.id}/0.jpg`,
+          this.pathFromId(added.id, 0),
         );
-      } catch (e) {}
+        productDocument.images = [this.pathFromId(added.id, 0)];
+      } catch (e) {
+        console.log("Image Not Found ! ");
+      }
     }
+    productDocument.save();
     return added.id;
   }
 
@@ -74,7 +83,7 @@ export class ProductService {
     // console.log(imageDiscovery);
     await fs.writeFile(`uploads/temp/${id}.jpg`, Buffer.from(imageContent));
 
-    return { id: id };
+    return { id: id, details: {} };
   }
 
   async discoverImage(imageBuffer) {
@@ -99,7 +108,19 @@ export class ProductService {
     }
   }
 
-  async addImage(imageBuffer) {}
+  async addImage(product: Product, imageFile: Express.Multer.File) {
+    const indecies = product.images.map((path) =>
+      Number(path.split("/").pop().split(".")[0]),
+    );
+    const next = indecies.length == 0 ? 0 : Math.max(...indecies) + 1;
+    await fs.mkdir(`uploads/products/${product.id}`, { recursive: true });
+    const path = this.pathFromId(product.id, next);
+    await fs.writeFile(path, Buffer.from(imageFile.buffer));
+    await this.productModel.findByIdAndUpdate(product.id, {
+      images: [...product.images, path],
+    });
+    return path;
+  }
 
   async getProductOwner(productId: string) {
     const product = await this.productModel
@@ -192,23 +213,50 @@ export class ProductService {
     return Product.fromArray(results);
   }
 
-  async getAllCategories() {}
-
   async findByUserId(id) {
     return (await this.productModel.find({ owner: id }).lean().exec()).map(
       (doc) => Product.fromDoc(doc),
     );
   }
-   /**
+
+  /**
    * Search for products by name.
    * @param name The name of the product to search for.
    */
-   async searchByName(name: string): Promise<Product[]> {
+  async searchByName(name: string): Promise<Product[]> {
     const products = await this.productModel
-      .find({ name: { $regex: name, $options: 'i' } })
+      .find({ name: { $regex: name, $options: "i" } })
       .lean()
       .exec();
 
     return products.map((doc) => Product.fromDoc(doc));
+  }
+
+  async isOwner(prod: Product, user: User): Promise<void> {
+    if (prod.owner.toString() !== user.id.toString())
+      throw new ForbiddenException("This Product is not yours");
+  }
+
+  async getImageLink(prod: Product, index: number) {
+    if (prod.images && prod.images.length === 0)
+      return "uploads/products/default.jpg";
+    if (prod.images.length <= index || index < 0)
+      throw new NotFoundException(`Image N° ${index + 1} cannot be found`);
+    return prod.images[index];
+  }
+
+  async getAllImages(id: string) {
+    const prod = await this.findOne(id);
+    if (!prod) throw new NotFoundException("Product not found");
+    return prod.images;
+  }
+
+  async changeImage(prod: Product, file, index: number) {
+    if (!Boolean(prod.images) || !prod.images[index])
+      throw new NotFoundException(`Image with index ${index} is not found`);
+    // await fs.rm(prod.images[index]);
+    console.log(file);
+    console.log("inside change image handler");
+    await fs.writeFile(prod.images[index], Buffer.from(file.buffer));
   }
 }

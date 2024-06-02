@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   UploadedFile,
   UseGuards,
@@ -24,12 +25,31 @@ import { User } from "../users/entities/user.entity";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage } from "multer";
 import { Category } from "../enum/product-category.enum";
+import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
+import { Product } from "./entities/product.entity";
 
 @ApiTags("product")
 //@Roles(['admin'])
 @Controller("product")
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Put("/:id/image/change/:index?")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(), // Use memory storage
+    }),
+  )
+  async changeImage(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+    @Param("id", ProductByIdPipe) product: Product,
+    @Param("index", new DefaultValuePipe(0), ParseIntPipe) index: number,
+  ) {
+    await this.productService.isOwner(product, user);
+    return this.productService.changeImage(product, file, index);
+  }
 
   @Get("filter")
   async getFiltered(
@@ -46,6 +66,14 @@ export class ProductController {
     );
   }
 
+  @Get(":id/images")
+  async getAllImages(
+    @Param("id") id: string,
+    @Param("index", new DefaultValuePipe(-1), ParseIntPipe) index: number,
+  ) {
+    return this.productService.getAllImages(id);
+  }
+
   @Get("categories")
   async getAllCategories() {
     return Object.values(Category);
@@ -53,12 +81,17 @@ export class ProductController {
 
   @Post("/create/:imageId?")
   @UseGuards(JwtAuthGuard)
-  submit(
+  async submit(
     @Body() createProductDto: CreateProductDto,
     @CurrentUser() user: User,
     @Param("imageId") imageId: string,
   ) {
-    return this.productService.create(createProductDto, user.id, imageId);
+    const id = await this.productService.create(
+      createProductDto,
+      user.id,
+      imageId,
+    );
+    return { id };
   }
 
   @Post("/discover")
@@ -68,12 +101,36 @@ export class ProductController {
       storage: memoryStorage(), // Use memory storage
     }),
   )
-  discover(
+  async discover(
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
     console.log(file.buffer);
     return this.productService.discover(file.buffer);
+  }
+
+  @Post("/:id/image/add")
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: memoryStorage(), // Use memory storage
+    }),
+  )
+  async addImage(
+    @UploadedFile() file: Express.Multer.File,
+    @CurrentUser() user: User,
+    @Param("id", ProductByIdPipe) product: Product,
+  ) {
+    await this.productService.isOwner(product, user);
+    return this.productService.addImage(product, file);
+  }
+
+  @Get(":id/image/:index?")
+  async getImageLink(
+    @Param("id", ProductByIdPipe) product: Product,
+    @Param("index", new DefaultValuePipe(0), ParseIntPipe) index: number,
+  ) {
+    return this.productService.getImageLink(product, index);
   }
 
   @Get()
@@ -112,8 +169,9 @@ export class ProductController {
     }
     return product;
   }
-  @Get('search/:name')
-  async search(@Param('name') name: string) {
+
+  @Get("search/:name")
+  async search(@Param("name") name: string) {
     return this.productService.searchByName(name);
   }
 }
