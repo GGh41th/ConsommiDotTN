@@ -1,10 +1,14 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, UseGuards } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { ApiTags } from "@nestjs/swagger";
 import * as fs from "fs";
+import { RolesGuard } from "./auth/roles/roles.guard";
+import { Roles } from "./auth/roles/roles.decorator";
+import { Role } from "./enum/user-role.enum";
 
 @Controller()
 @ApiTags("Genral")
+@UseGuards(RolesGuard)
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -18,6 +22,9 @@ export class AppController {
     return fs.readFileSync("public/index.js", "utf-8");
   }
 
+  @Roles([Role.ADMIN, Role.GUEST])
   @Get("test")
-  async test() {}
+  async test() {
+    return "user";
+  }
 }

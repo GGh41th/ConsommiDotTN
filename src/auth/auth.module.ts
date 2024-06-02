@@ -8,6 +8,7 @@ import { UsersModule } from "src/users/users.module";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 import { WsJwtGuard } from "./guards/ws-auth.guard";
+import { RolesGuard } from "./roles/roles.guard";
 
 // @Global()
 @Module({
@@ -22,7 +23,7 @@ import { WsJwtGuard } from "./guards/ws-auth.guard";
     }),
     UsersModule,
   ],
-  providers: [AuthService, JwtAuthGuard, JwtStrategy,WsJwtGuard],
+  providers: [AuthService, JwtAuthGuard, JwtStrategy, WsJwtGuard, RolesGuard],
   controllers: [AuthController],
   exports: [AuthService, JwtAuthGuard],
 })

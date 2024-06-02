@@ -1,49 +1,78 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { log } from 'console';
-import { Roles } from './roles.decorator';
-import { Observable } from 'rxjs';
-import { Request } from 'express';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { Roles } from "./roles.decorator";
+import { Role } from "../../enum/user-role.enum";
+import { JwtService } from "@nestjs/jwt";
+import { PayloadInterface } from "../interfaces/payload.interface";
+import { UsersService } from "../../users/users.service";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector,
-  ) {
-    log('instanciated RolesGuard');
-  }
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    let failStrategy = false;
     let roles = this.reflector.get(Roles, context.getHandler());
-    let controllerRoles = this.reflector.get(Roles, context.getClass());
-    roles = roles ?? controllerRoles;
-    log(roles);
+    const bizarre = roles.find(
+      (role) =>
+        !Object.values(Role)
+          .map((rul) => rul.toString())
+          .includes(role),
+    );
+    if (bizarre)
+      throw new InternalServerErrorException(
+        `Contact the Admin and inform him for this error: "An Unknown role '${bizarre}', Use Role Enumerator instead of literal strings!"`,
+      );
     if (!roles) {
       return true;
     }
-    if (roles.length === 0 || Object.keys(roles).length === 0) return false;
-    if (roles.includes('Guest')) return true;
-
-    const request = context.switchToHttp().getRequest();
-    const auth = request.headers['authorization'];
-    if (!auth) throw new UnauthorizedException('no token found');
-    const cred = Buffer.from(auth.split(' ')[1], 'base64')
-      .toString('utf-8')
-      .split(':');
-    const user = { name: cred[0], pass: cred[1] };
-    if (roles.includes('User')) {
-      if (['omar', 'yac'].includes(user.name)) {
-        return true;
-      }
+    if (roles.length === 0 || Object.keys(roles).length === 0) return true;
+    // no auth is required
+    if (roles.includes(Role.GUEST)) {
+      if (roles.length == 1) return true;
+      failStrategy = true;
     }
-    return ['root'].includes(user.name);
-  }
-  
-}
+    // Extracting Payload
+    try {
+      const request = context.switchToHttp().getRequest();
+      const auth: string = request.headers["authorization"];
+      if (!auth) throw new UnauthorizedException("no token found");
+      console.log(auth);
+      const token = auth.split(" ").pop();
+      console.log(token);
+      if (!token) throw new Error("Inavlid Token");
+      const decodedUser: PayloadInterface = await this.jwtService.decode(token);
+      console.log(decodedUser);
+      //Finding User
+      const user = await this.usersService.findOne(decodedUser.id);
+      if (!user) throw new UnauthorizedException("Unable to find this user!");
+      request.user = user;
+      // appending requirements
+      console.log(user);
+      let appendedRoles = [...roles];
+      if (appendedRoles.includes(Role.CONSUMER))
+        appendedRoles.push(Role.MERCHANT);
+      if (appendedRoles.includes(Role.MERCHANT)) appendedRoles.push(Role.ADMIN);
 
+      if (!appendedRoles.includes(user.role))
+        throw new ForbiddenException(
+          `You don't have the Role enough to access this resource: Requires ${roles.join(", ")} but found ${decodedUser.role}`,
+        );
+    } catch (e) {
+      if (failStrategy) return true;
+      throw e;
+    }
+    return true;
+  }
+}
