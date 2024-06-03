@@ -1,6 +1,7 @@
 import { Prop, Schema } from "@nestjs/mongoose";
-import mongoose from "mongoose";
 import { ApproveStatus } from "../../enum/product-approve-status.enum";
+import mongoose from "mongoose";
+import { User } from "../../users/entities/user.entity";
 
 @Schema({ timestamps: true })
 export class Demand {
@@ -18,8 +19,8 @@ export class Demand {
 
   @Prop()
   id: string;
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User" })
-  userId: string;
+  @Prop({ type: mongoose.Types.ObjectId, ref: "User" })
+  user: string;
   @Prop({ required: true, default: ApproveStatus.PENDING })
   status: ApproveStatus;
 }

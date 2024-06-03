@@ -12,18 +12,18 @@ export class DemandService {
     private readonly usersService: UsersService,
   ) {}
 
-  async requestDemand(userId: string) {
-    const old = await this.demandModel.findOne({ userId: userId }).exec();
+  async requestDemand(user: string) {
+    const old = await this.demandModel.findOne({ user: user }).exec();
     if (old?.status === ApproveStatus.APPROVED) {
       return false;
     } else if (old) {
       return await this.demandModel
-        .findOneAndUpdate({ userId }, { status: ApproveStatus.PENDING })
+        .findOneAndUpdate({ user }, { status: ApproveStatus.PENDING })
         .exec();
     }
 
     const doc = new this.demandModel({
-      userId: userId,
+      user: user,
       status: ApproveStatus.PENDING,
     });
     doc.id = doc._id.toString();
@@ -32,30 +32,32 @@ export class DemandService {
 
   async getDemands(isEverything: boolean) {
     const criteria = isEverything ? {} : { status: ApproveStatus.PENDING };
-    const demands = await this.demandModel.find(criteria).lean().exec();
+    const demands = await this.demandModel
+      .find(criteria)
+      .populate("user")
+      .lean()
+      .exec();
+    const self = this;
     return Demand.fromArray(demands);
   }
 
-  async respondDemand(userId: string, grant: boolean) {
-    await this.usersService.changeRole(userId, grant);
+  async respondDemand(user: string, grant: boolean) {
+    await this.usersService.changeRole(user, grant);
     await this.demandModel
       .findOneAndUpdate(
-        { userId: userId },
+        { user: user },
         { status: grant ? ApproveStatus.APPROVED : ApproveStatus.REJECTED },
       )
       .lean()
       .exec();
   }
 
-  async cancelDemand(userId: string) {
-    const demand = await this.demandModel
-      .findOne({ userId: userId })
-      .lean()
-      .exec();
+  async cancelDemand(user: string) {
+    const demand = await this.demandModel.findOne({ user: user }).lean().exec();
     if (!demand || demand.status !== ApproveStatus.PENDING) {
       return false;
     }
-    await this.demandModel.findOneAndDelete({ userId: userId }).lean().exec();
+    await this.demandModel.findOneAndDelete({ user: user }).lean().exec();
     return true;
   }
 
@@ -63,9 +65,9 @@ export class DemandService {
     return this.usersService.getAllSellers();
   }
 
-  async getDemandByUserId(userId: string) {
+  async getDemandByUserId(user: string) {
     return Demand.fromDoc(
-      await this.demandModel.findOne({ userId: userId }).lean().exec(),
+      await this.demandModel.findOne({ user: user }).lean().exec(),
     );
   }
 }
