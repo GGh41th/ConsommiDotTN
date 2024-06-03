@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -13,6 +14,8 @@ import {
   ClothesDetails,
   FurnitureDetails,
   JewelryDetails,
+  LaptopDetails,
+  PhoneDetails,
   Product,
   TechDetails,
 } from "./entities/product.entity";
@@ -50,12 +53,9 @@ export class ProductService {
       Jewellery: Category.JEWELRY,
       Car: Category.CAR,
     };
-    // Clothes: Dress, Jacket, Pants, Shoes, Short, Suit, Sunglasses, T-shirt, Watch
-    // Furniture: Bed, Chair, Sofa, Swivel Chair, Table
-    // IT: Laptop, Printer, Smartphone, TV
-    // Jewellery : Earring , Necklace, Ring
-    // For the Jewellery we predict also from the image its material (Gold, Silver, Bronze)
+
     let category: Category = mainClass[discover.main_class];
+    if (discover.main_class === "Other") category = null;
 
     let details:
       | CarDetails
@@ -65,7 +65,7 @@ export class ProductService {
       | TechDetails
       | JewelryDetails
       | any;
-    switch (discover.main_class) {
+    switch (mainClass[discover.main_class]) {
       case Category.FURNITURE:
         details = new FurnitureDetails();
         details.type = discover.sub_class;
@@ -90,6 +90,15 @@ export class ProductService {
       case Category.CAR:
         details = new CarDetails();
         break;
+      default:
+        details = {};
+    }
+    if (category === Category.TECH && details.type === "Laptop") {
+      category = Category.LAPTOP;
+      details = new LaptopDetails();
+    } else if (category === Category.TECH && details.type === "Samrtphone") {
+      category = Category.PHONE;
+      details = new PhoneDetails();
     }
     return { category, details };
   }
@@ -145,11 +154,11 @@ export class ProductService {
   async discover(imageContent) {
     const id = require("uuid").v4();
     // TODO  : Forward Image to ML Model
-    // const imageDiscovery = await this.discoverImage(imageContent);
-    // console.log(imageDiscovery);
+    const imageDiscovery = await this.discoverImage(imageContent);
+    console.log(imageDiscovery);
     await fs.writeFile(`uploads/temp/${id}.jpg`, Buffer.from(imageContent));
 
-    return { id: id, details: {} };
+    return { id: id, ...this.discoveryHandler(imageDiscovery) };
   }
 
   async discoverImage(imageBuffer) {
@@ -167,11 +176,36 @@ export class ProductService {
           ...form.getHeaders(),
         },
       });
-      // Send the request
       return response.data;
     } catch (error) {
       console.error("Error uploading image:", error);
     }
+  }
+
+  async predictPrice(category: Category, data: any) {
+    let suffix;
+    switch (category) {
+      case Category.LAPTOP:
+        suffix = "Laptop";
+        break;
+      case Category.PHONE:
+        suffix = "Mobile";
+        break;
+      case Category.CLOTHES:
+        suffix = "Clothes";
+        break;
+      case Category.CAR:
+        suffix = "Cars";
+        break;
+      default:
+        throw new BadRequestException(
+          `Only ${Category.LAPTOP} ${Category.CAR} ${Category.CLOTHES} ${Category.PHONE} categories are predictable`,
+        );
+    }
+
+    const url = `${process.env.ML_MODEL_URL}/price/${suffix}`; // Replace with your target URL
+    const response = await axios.post(url, data);
+    return response.data;
   }
 
   async addImage(product: Product, imageFile: Express.Multer.File) {

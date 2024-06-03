@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   DefaultValuePipe,
@@ -105,7 +106,7 @@ export class ProductController {
     @UploadedFile() file: Express.Multer.File,
     @CurrentUser() user: User,
   ) {
-    console.log(file.buffer);
+    if (!file) throw new BadRequestException("Image must no be empty");
     return this.productService.discover(file.buffer);
   }
 
