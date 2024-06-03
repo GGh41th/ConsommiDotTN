@@ -27,20 +27,16 @@ export class AuthService {
     user = { ...user, ...userData };
     const salt = await bcrypt.genSalt();
     user.password = await bcrypt.hash(userData.password, salt);
-    // TODO : Need to remove the return here just for test purpose
-    // ! Warning
-
     const existant = await this.usersService.findByEmail(user.email);
     if (existant && Object.keys(existant).length>0) throw new ConflictException("Email Already Exists");
-
     return await this.usersService.add(user);
   }
 
   async login(credentials: LoginCredentialsDTO) {
     const { email, password } = credentials;
     const user: User = await this.usersService.findByEmail(email);
-
-    if (!user) {
+    console.log(user)
+    if (!user.email) {
       throw new UnauthorizedException(
         "Wrong login credentials: email not found!",
       );
