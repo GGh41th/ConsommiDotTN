@@ -7,13 +7,22 @@ import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { Product } from "./entities/product.entity";
+import {
+  AnimalDetails,
+  CarDetails,
+  ClothesDetails,
+  FurnitureDetails,
+  JewelryDetails,
+  Product,
+  TechDetails,
+} from "./entities/product.entity";
 import { ImageService } from "src/image/image.service";
 import axios from "axios";
 import * as process from "process";
 import { User } from "../users/entities/user.entity";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { UpdateProductHistoryDto } from "../product-history/dto/update-product-history.dto";
+import { Category } from "../enum/product-category.enum";
 
 const FormData = require("form-data");
 
@@ -27,6 +36,63 @@ export class ProductService {
     private readonly imageService: ImageService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  discoveryHandler(discover: {
+    main_class: string;
+    sub_class: string;
+    material?: string;
+  }) {
+    const mainClass = {
+      It: Category.TECH,
+      Clothe: Category.CLOTHES,
+      Furniture: Category.FURNITURE,
+      Animal: Category.ANIMAL,
+      Jewellery: Category.JEWELRY,
+      Car: Category.CAR,
+    };
+    // Clothes: Dress, Jacket, Pants, Shoes, Short, Suit, Sunglasses, T-shirt, Watch
+    // Furniture: Bed, Chair, Sofa, Swivel Chair, Table
+    // IT: Laptop, Printer, Smartphone, TV
+    // Jewellery : Earring , Necklace, Ring
+    // For the Jewellery we predict also from the image its material (Gold, Silver, Bronze)
+    let category: Category = mainClass[discover.main_class];
+
+    let details:
+      | CarDetails
+      | AnimalDetails
+      | ClothesDetails
+      | FurnitureDetails
+      | TechDetails
+      | JewelryDetails
+      | any;
+    switch (discover.main_class) {
+      case Category.FURNITURE:
+        details = new FurnitureDetails();
+        details.type = discover.sub_class;
+        break;
+      case Category.TECH:
+        details = new TechDetails();
+        details.type = discover.sub_class;
+        break;
+      case Category.JEWELRY:
+        details = new JewelryDetails();
+        details.type = discover.sub_class;
+        details.material = discover.material;
+        break;
+      case Category.ANIMAL:
+        details = new AnimalDetails();
+        details.species = discover.sub_class;
+        break;
+      case Category.CLOTHES:
+        details = new ClothesDetails();
+        details.functionality = discover.sub_class;
+        break;
+      case Category.CAR:
+        details = new CarDetails();
+        break;
+    }
+    return { category, details };
+  }
 
   /**
    * Upload Product Object into Database ! Highly Recommended for any save

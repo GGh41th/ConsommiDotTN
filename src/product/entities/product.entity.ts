@@ -63,44 +63,119 @@ export class Product {
 
 export class ClothesDetails {
   @IsNotEmpty()
-  brand: string;
+  brand: string; // ADIDAS
   @IsNotEmpty()
-  color: number;
+  color: string; // red
   @IsOptional()
-  functionality: string;
+  functionality: string; // 9at3a: shirt
   @IsOptional()
-  material: string;
+  thickness: number; // 5ochn
   @IsOptional()
-  seasonality: string;
+  height: number; // 40.8
+  @IsOptional()
+  width: number; // 54.0
+  @IsOptional()
+  material: string; // cotton
+  @IsOptional()
+  seasonality: string; // summer
   @IsNotEmpty()
-  size: string;
+  size: string; // XL
   @IsOptional()
-  style: string;
+  style: string; // formal
   @IsNotEmpty()
-  type: string;
+  type: string; // confy
 }
 
 export class TechDetails {
-  batteryLife: string;
   @IsNotEmpty()
   brand: string;
-  @IsOptional()
-  cpu: string;
-  @IsOptional()
-  features: string;
-  @IsOptional()
-  gpu: string;
-  @IsOptional()
-  os: string;
-  @IsOptional()
-  ram: string;
-  @IsOptional()
-  screenSize: string;
-
-  @IsOptional()
-  storage: string;
   @IsNotEmpty()
   type: string;
+
+  // Optional fields
+  @IsOptional()
+  model: string;
+  @IsOptional()
+  features: string;
+}
+
+export class PhoneDetails {
+  @IsNotEmpty()
+  brand: string; // "LG"
+
+  @IsNotEmpty()
+  model: string; // "Wing"
+
+  @IsNotEmpty()
+  storage: number; // 256
+
+  @IsNotEmpty()
+  ram: number; // 12
+
+  @IsNotEmpty()
+  screenSize: number; // 7
+
+  @IsNotEmpty()
+  camera: number; // 20
+
+  @IsNotEmpty()
+  battery: number; // 4000
+}
+
+export class LaptopDetails {
+  @IsNotEmpty()
+  brand: string; // "ASUS"
+
+  @IsNotEmpty()
+  processor_brand: string; // "Intel"
+
+  @IsNotEmpty()
+  processor_name: string; // "Core i5"
+
+  @IsOptional()
+  processor_gnrtn?: string; // "10th"
+
+  @IsNotEmpty()
+  ram_gb: string; // "8 GB"
+
+  @IsNotEmpty()
+  ram_type: string; // "DDR4"
+
+  @IsNotEmpty()
+  ssd: string; // "512 GB"
+
+  @IsOptional()
+  hdd?: string; // "0 GB"
+
+  @IsNotEmpty()
+  os: string; // "Windows"
+
+  @IsNotEmpty()
+  os_bit: string; // "32-bit"
+
+  @IsOptional()
+  graphic_card_gb?: string; // "2 GB"
+
+  @IsOptional()
+  weight?: string; // "Casual"
+
+  @IsOptional()
+  warranty?: string; // "No warranty"
+
+  @IsOptional()
+  Touchscreen?: string; // "No"
+
+  @IsOptional()
+  msoffice?: string; // "No"
+
+  @IsOptional()
+  rating?: string; // "3 stars"
+
+  @IsOptional()
+  numberOfRatings?: number; // 0
+
+  @IsOptional()
+  numberOfReviews?: number; // 0
 }
 
 export class JewelryDetails {
@@ -128,4 +203,27 @@ export class AnimalDetails {
   gender: string;
   @IsNotEmpty()
   color: string;
+}
+
+export class CarDetails {
+  @IsNotEmpty()
+  title: string; // "neuvqdfqsdfe"
+
+  @IsNotEmpty()
+  brand: string; // "BMW"
+
+  @IsNotEmpty()
+  model: string; // "Golf"
+
+  @IsNotEmpty()
+  transmission: string; // "Automatique"
+
+  @IsNotEmpty()
+  fuelType: string; // "Diesel"
+
+  @IsNotEmpty()
+  year: number; // 2020
+
+  @IsNotEmpty()
+  mileage: number; // 90000
 }

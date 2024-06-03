@@ -1,18 +1,15 @@
 import { Type } from "class-transformer";
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from "class-validator";
+import { IsEnum, IsNotEmpty, ValidateNested } from "class-validator";
 import { City } from "src/enum/city.enum";
 import { Category } from "src/enum/product-category.enum";
 import {
   AnimalDetails,
+  CarDetails,
   ClothesDetails,
   FurnitureDetails,
   JewelryDetails,
+  LaptopDetails,
+  PhoneDetails,
   TechDetails,
 } from "../entities/product.entity";
 import { BadRequestException } from "@nestjs/common";
@@ -52,94 +49,23 @@ export class CreateProductDto {
         return FurnitureDetails;
       case Category.ANIMAL:
         return AnimalDetails;
+      case Category.CAR:
+        return CarDetails;
+      case Category.PHONE:
+        return PhoneDetails;
+      case Category.LAPTOP:
+        return LaptopDetails;
       default:
         throw new BadRequestException("infound category");
     }
   })
   details:
     | TechDetails
+    | PhoneDetails
+    | LaptopDetails
     | JewelryDetails
     | ClothesDetails
     | FurnitureDetails
+    | CarDetails
     | AnimalDetails;
 }
-
-export class ClothesDetailsDto {
-  @IsOptional()
-  @IsString()
-  brand?: string;
-
-  @IsOptional()
-  @IsString()
-  color?: string;
-
-  @IsOptional()
-  @IsString()
-  functionality?: string;
-
-  @IsOptional()
-  @IsString()
-  material?: string;
-
-  @IsOptional()
-  @IsString()
-  seasonality?: string;
-
-  @IsOptional()
-  @IsString()
-  size?: string;
-
-  @IsOptional()
-  @IsString()
-  style?: string;
-
-  @IsOptional()
-  @IsString()
-  type?: string;
-}
-
-export class TechDetailsDto {
-  @IsOptional()
-  @IsString()
-  batteryLife?: string;
-
-  @IsOptional()
-  @IsString()
-  brand?: string;
-
-  @IsOptional()
-  @IsString()
-  cpu?: string;
-
-  @IsOptional()
-  @IsString()
-  features?: string;
-
-  @IsOptional()
-  @IsString()
-  gpu?: string;
-
-  @IsOptional()
-  @IsString()
-  os?: string;
-
-  @IsOptional()
-  @IsString()
-  ram?: string;
-
-  @IsOptional()
-  @IsString()
-  screenSize?: string;
-
-  @IsOptional()
-  @IsString()
-  storage?: string;
-
-  @IsNotEmpty()
-  type: string;
-}
-
-const DetailsDTOType = {
-  clothes: ClothesDetailsDto,
-  tech: TechDetailsDto,
-};

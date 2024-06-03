@@ -8,6 +8,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { User } from "./entities/user.entity";
 import * as bcrypt from "bcrypt";
+import { Role } from "../enum/user-role.enum";
 
 @Injectable()
 export class UsersService {
@@ -68,5 +69,27 @@ export class UsersService {
   async verifyUserExsitance(id: string): Promise<void> {
     const finduser: User = await this.findOne(id);
     if (!Boolean(finduser)) throw new NotFoundException("user not found");
+  }
+
+  async changeRole(userId: string, grant: boolean) {
+    const user = await this.findOne(userId);
+    if (!user) throw new NotFoundException("user doesn't not exist");
+    return this.userModel
+      .findOneAndUpdate(
+        { id: userId },
+        {
+          role: grant ? Role.MERCHANT : Role.CONSUMER,
+        },
+      )
+      .lean()
+      .exec();
+  }
+
+  async getAllSellers() {
+    const users = await this.userModel
+      .find({ role: Role.MERCHANT })
+      .lean()
+      .exec();
+    return User.fromArray(users);
   }
 }

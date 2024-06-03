@@ -6,13 +6,16 @@ import { Role } from "src/enum/user-role.enum";
 export class User {
   constructor() {
     this.role = Role.CONSUMER;
-    this.isApproved = false;
   }
 
   static fromDoc(doc: any): User {
     const { _id = null, __v = null, ...user } = { ...doc };
 
     return user;
+  }
+
+  static fromArray(docs: any[]): User[] {
+    return docs.map((doc) => User.fromDoc(doc));
   }
 
   static clean(user: User) {
@@ -40,9 +43,6 @@ export class User {
   street: string;
   @Prop()
   postalCode: string;
-
-  @Prop({ required: true, default: false })
-  isApproved: boolean;
 
   @Prop({ required: true, enum: Role, default: Role.CONSUMER }) // Reference the Role enum
   role: Role;

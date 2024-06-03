@@ -15,6 +15,7 @@ import { ConversationModule } from "./conversation/conversation.module";
 import { SocketModule } from "./socket/socket.module";
 import { ProductHistoryModule } from "./product-history/product-history.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
+import { DemandModule } from './demand/demand.module';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ dotenv.config();
     ConversationModule,
     SocketModule,
     ProductHistoryModule,
+    DemandModule,
   ],
   controllers: [AppController],
   providers: [

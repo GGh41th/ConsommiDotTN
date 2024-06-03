@@ -24,6 +24,9 @@ export class RolesGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     let failStrategy = false;
     let roles = this.reflector.get(Roles, context.getHandler());
+    if (!roles) {
+      return true;
+    }
     const bizarre = roles.find(
       (role) =>
         !Object.values(Role)
@@ -34,9 +37,7 @@ export class RolesGuard implements CanActivate {
       throw new InternalServerErrorException(
         `Contact the Admin and inform him for this error: "An Unknown role '${bizarre}', Use Role Enumerator instead of literal strings!"`,
       );
-    if (!roles) {
-      return true;
-    }
+
     if (roles.length === 0 || Object.keys(roles).length === 0) return true;
     // no auth is required
     if (roles.includes(Role.GUEST)) {
@@ -67,7 +68,7 @@ export class RolesGuard implements CanActivate {
 
       if (!appendedRoles.includes(user.role))
         throw new ForbiddenException(
-          `You don't have the Role enough to access this resource: Requires ${roles.join(", ")} but found ${decodedUser.role}`,
+          `You don't have the Role enough to access this resource: Requires ${roles.join(", ")} but found ${user.role}`,
         );
     } catch (e) {
       if (failStrategy) return true;
