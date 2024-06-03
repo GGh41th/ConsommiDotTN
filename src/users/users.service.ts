@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -9,6 +10,7 @@ import { Model } from "mongoose";
 import { User } from "./entities/user.entity";
 import * as bcrypt from "bcrypt";
 import { Role } from "../enum/user-role.enum";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
 @Injectable()
 export class UsersService {
@@ -49,10 +51,7 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto) {
     //verify the user exist
     await this.verifyUserExsitance(id);
-    if (updateUserDto.password) {
-      const salt = await bcrypt.genSalt();
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
-    }
+
     return await this.userModel
       .findOneAndUpdate({ id: id }, updateUserDto)
       .lean()
@@ -91,5 +90,20 @@ export class UsersService {
       .lean()
       .exec();
     return User.fromArray(users);
+  }
+
+  async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
+    let u = await this.findOne(user.id);
+    const isSame = await bcrypt.compare(changePasswordDto.password, u.password);
+    if (!isSame) throw new ForbiddenException("Old password is not correct");
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      salt,
+    );
+    await this.userModel
+      .findByIdAndUpdate(user.id, { password: hashedPassword })
+      .lean()
+      .exec();
   }
 }

@@ -18,6 +18,7 @@ import { CurrentUser } from "../auth/decorators/user.decorator";
 import { Roles } from "../auth/roles/roles.decorator";
 import { Role } from "../enum/user-role.enum";
 import { RolesGuard } from "../auth/roles/roles.guard";
+import { ChangePasswordDto } from "./dto/change-password.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -36,7 +37,7 @@ export class UsersController {
   }
 
   @Patch("infos")
-  @UseGuards(JwtAuthGuard) // Assuming AuthGuard is your authentication guard
+  @UseGuards(JwtAuthGuard)
   async changeInfos(
     @CurrentUser() user: User,
     @Body() updateUserDto: UpdateUserDto,
@@ -44,8 +45,17 @@ export class UsersController {
     return this.update(user.id, updateUserDto);
   }
 
-  @Roles([Role.ADMIN])
+  @Patch("infos/password")
   @UseGuards(JwtAuthGuard)
+  async changePassword(
+    @CurrentUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    await this.usersService.changePassword(user, changePasswordDto);
+    return { message: "password changed" };
+  }
+
+  @Roles([Role.ADMIN])
   @Get("email/:email")
   findOneByEmail(@Param("email") email: string): Promise<User> {
     return this.usersService.findByEmail(email);
@@ -55,7 +65,7 @@ export class UsersController {
   @Roles([Role.ADMIN])
   async findAll(
     @Query("transform")
-    transform: boolean, // Type hint for clarity
+    transform: boolean,
   ) {
     return this.usersService.findAll(Boolean(transform));
   }
