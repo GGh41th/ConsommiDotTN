@@ -58,7 +58,6 @@ export class ConversationService {
   
     if (!conversation) {
       console.log('conversation not found');
-      // If not found, create a new conversation
       var newconv= new this.conversationModel({
         client: user.id,
         product,
@@ -147,7 +146,8 @@ export class ConversationService {
                   "name": prod.name,
                   "description": prod.description,
                   "price": prod.price,
-                  "owner": prod.owner
+                  "owner": prod.owner,
+                  "image" : prod.images["0"]
 
                }
                ,"messagesSize":conversation.messages.length};
