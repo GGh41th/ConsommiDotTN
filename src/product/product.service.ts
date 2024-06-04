@@ -77,7 +77,7 @@ export class ProductService {
       case Category.JEWELRY:
         details = new JewelryDetails();
         details.type = discover.sub_class;
-        details.material = discover.material;
+        details.material = discover.material ?? null;
         break;
       case Category.ANIMAL:
         details = new AnimalDetails();
@@ -154,7 +154,9 @@ export class ProductService {
   async discover(imageContent) {
     const id = require("uuid").v4();
     // TODO  : Forward Image to ML Model
-    const imageDiscovery = await this.discoverImage(imageContent);
+    // const imageDiscovery = await this.discoverImage(imageContent);
+    const imageDiscovery = this.MOCKdiscoverImage(imageContent);
+
     console.log(imageDiscovery);
     await fs.writeFile(`uploads/temp/${id}.jpg`, Buffer.from(imageContent));
 
@@ -182,14 +184,97 @@ export class ProductService {
     }
   }
 
-  async predictPrice(category: Category, data: any) {
+  MOCKdiscoverImage(imageContent) {
+    const main_class = [
+      "It",
+      "Clothe",
+      "Furniture",
+      "Animal",
+      "Jewellery",
+      "Car",
+      "Other",
+    ];
+    const sub_class = {
+      Clothe: [
+        "Dress",
+        "Jacket",
+        "Pants",
+        "Shoes",
+        "Short",
+        "Suit",
+        "Sunglasses",
+        "T-shirt",
+        "Watch",
+      ],
+      It: ["Laptop", "Printer", "Smartphone", "TV"],
+      Furniture: ["Bed", "Chair", "Sofa", "Swivel", "Chair", "Table"],
+      Animal: [null],
+      Jewellery: ["Earring", "Necklace", "Ring"],
+      Car: [null],
+      Other: [null],
+    };
+    let randMain = main_class[Math.floor(Math.random() * main_class.length)];
+    let randSubArr = sub_class[randMain];
+    let randSub = randSubArr[Math.floor(Math.random() * randSubArr.length)];
+    return { main_class: randMain, sub_class: randSub };
+  }
+
+  async predictPrice(product: Product) {
+    // smartphone:
+    // {
+    //   "Brand":"LG",
+    //   "Model":"Wing",
+    //   "Storage" : 256,
+    //   "RAM" : 12,
+    //   "Screen Size" : 7,
+    //   "Camera" : 20,
+    //   "Battery" : 4000
+    // }
+    // Ghassen
+    // Ghassen Cherif
+    // clothes:
+    // {
+    //   "marka": "HA",
+    //   "naw3": "confy",
+    //   "9at3a": "Shirt",
+    //   "khochn": 1.021667,
+    //   "toul": 40.8,
+    //   "3ordh": 54.0,
+    //   "color": "red"
+    // }
+    // Ghassen
+    // Ghassen Cherif
+    // cars:
+    // {
+    //   "Titre": "neuvqdfqsdfe" ,
+    //   "Marque": "BMW",
+    //   "Modele": "Golf",
+    //   "Transmission": "Automatique",
+    //   "Carburant": "Diesel",
+    //   "Annee": 2020,
+    //   "Kilometrage": 90000
+    // }
+
     let suffix;
+    let shapedData;
+    let category = product.category;
     switch (category) {
       case Category.LAPTOP:
         suffix = "Laptop";
         break;
       case Category.PHONE:
+        let details: PhoneDetails;
+        details = { ...product.details };
         suffix = "Mobile";
+        shapedData = {
+          Brand: details.brand,
+          Model: details.model,
+          Storage: details.storage,
+          RAM: details.ram,
+          "Screen Size": details.screenSize,
+          Camera: details.camera,
+          Battery: details.battery,
+        };
         break;
       case Category.CLOTHES:
         suffix = "Clothes";
@@ -204,7 +289,7 @@ export class ProductService {
     }
 
     const url = `${process.env.ML_MODEL_URL}/price/${suffix}`; // Replace with your target URL
-    const response = await axios.post(url, data);
+    const response = await axios.post(url, shapedData);
     return response.data;
   }
 

@@ -4,7 +4,7 @@ import { City } from "src/enum/city.enum";
 import { ApproveStatus } from "src/enum/product-approve-status.enum";
 import { Category } from "src/enum/product-category.enum";
 import { User } from "../../users/entities/user.entity";
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 
 @Schema()
 export class Product {
@@ -155,23 +155,30 @@ export class PhoneDetails {
   }
 
   @IsNotEmpty()
+  @IsString()
   brand: string; // "LG"
 
+  @IsString()
   @IsNotEmpty()
   model: string; // "Wing"
 
   @IsNotEmpty()
+  @IsNumber()
   storage: number; // 256
 
+  @IsNumber()
   @IsNotEmpty()
   ram: number; // 12
 
+  @IsNumber()
   @IsNotEmpty()
   screenSize: number; // 7
 
   @IsNotEmpty()
+  @IsNumber()
   camera: number; // 20
 
+  @IsNumber()
   @IsNotEmpty()
   battery: number; // 4000
 }
