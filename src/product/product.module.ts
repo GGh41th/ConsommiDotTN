@@ -9,8 +9,8 @@ import {
   SubscriptionSchema,
 } from "src/subscription/entities/subscription.entity";
 import { EventEmitterModule } from "@nestjs/event-emitter";
-import { OwnerGuard } from "./guards/owner.guard";
 import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
+import { UsersModule } from "../users/users.module";
 
 @Module({
   imports: [
@@ -18,7 +18,6 @@ import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
       {
         name: "Product",
         schema: ProductSchema,
-       
       },
       {
         name: Subscription.name, // Use the name property of the Subscription class
@@ -27,6 +26,7 @@ import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
     ]),
     ImageModule,
     EventEmitterModule.forRoot(),
+    UsersModule,
   ],
   controllers: [ProductController],
   providers: [ProductService, ProductByIdPipe],

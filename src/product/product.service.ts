@@ -219,48 +219,35 @@ export class ProductService {
     return { main_class: randMain, sub_class: randSub };
   }
 
-  async predictPrice(product: Product) {
-    // smartphone:
-    // {
-    //   "Brand":"LG",
-    //   "Model":"Wing",
-    //   "Storage" : 256,
-    //   "RAM" : 12,
-    //   "Screen Size" : 7,
-    //   "Camera" : 20,
-    //   "Battery" : 4000
-    // }
-    // Ghassen
-    // Ghassen Cherif
-    // clothes:
-    // {
-    //   "marka": "HA",
-    //   "naw3": "confy",
-    //   "9at3a": "Shirt",
-    //   "khochn": 1.021667,
-    //   "toul": 40.8,
-    //   "3ordh": 54.0,
-    //   "color": "red"
-    // }
-    // Ghassen
-    // Ghassen Cherif
-    // cars:
-    // {
-    //   "Titre": "neuvqdfqsdfe" ,
-    //   "Marque": "BMW",
-    //   "Modele": "Golf",
-    //   "Transmission": "Automatique",
-    //   "Carburant": "Diesel",
-    //   "Annee": 2020,
-    //   "Kilometrage": 90000
-    // }
-
+  async predictPrice(product: { category: string; details: any }) {
     let suffix;
     let shapedData;
     let category = product.category;
     switch (category) {
       case Category.LAPTOP:
         suffix = "Laptop";
+        let lap: LaptopDetails;
+        lap = { ...product.details };
+        shapedData = {
+          brand: lap.brand,
+          processor_brand: lap.processor_brand,
+          processor_name: lap.processor_name,
+          processor_gnrtn: lap.processor_gnrtn,
+          ram_gb: lap.ram_gb,
+          ram_type: lap.ram_type,
+          ssd: lap.ssd,
+          hdd: lap.hdd,
+          os: lap.os,
+          os_bit: lap.os_bit,
+          graphic_card_gb: lap.graphic_card_gb,
+          weight: lap.weight,
+          warranty: lap.warranty,
+          Touchscreen: lap.Touchscreen,
+          msoffice: lap.msoffice,
+          rating: lap.rating,
+          "Number of Ratings": lap.numberOfRatings,
+          "Number of Reviews": lap.numberOfReviews,
+        };
         break;
       case Category.PHONE:
         let details: PhoneDetails;
@@ -278,9 +265,31 @@ export class ProductService {
         break;
       case Category.CLOTHES:
         suffix = "Clothes";
+        let dcl: ClothesDetails;
+        dcl = { ...product.details };
+        shapedData = {
+          marka: dcl.brand,
+          naw3: dcl.type,
+          "9at3a": dcl.functionality,
+          khochn: dcl.thickness,
+          toul: dcl.height,
+          "3ordh": dcl.width,
+          color: dcl.color,
+        };
         break;
       case Category.CAR:
         suffix = "Cars";
+        let car: CarDetails;
+        car = { ...product.details };
+        shapedData = {
+          Titre: car.title,
+          Marque: car.brand,
+          Modele: car.model,
+          Transmission: car.transmission,
+          Carburant: car.fuelType,
+          Annee: car.year,
+          Kilometrage: car.mileage,
+        };
         break;
       default:
         throw new BadRequestException(

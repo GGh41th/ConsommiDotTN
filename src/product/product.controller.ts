@@ -28,10 +28,14 @@ import { memoryStorage } from "multer";
 import { Category } from "../enum/product-category.enum";
 import { ProductByIdPipe } from "./pipe/porduct-by-id.pipe";
 import { Product } from "./entities/product.entity";
+import { Roles } from "../auth/roles/roles.decorator";
+import { RolesGuard } from "../auth/roles/roles.guard";
+import { Role } from "../enum/user-role.enum";
 
 @ApiTags("product")
 //@Roles(['admin'])
 @Controller("product")
+@UseGuards(RolesGuard)
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -81,7 +85,7 @@ export class ProductController {
   }
 
   @Post("/create/:imageId?")
-  @UseGuards(JwtAuthGuard)
+  @Roles([Role.MERCHANT])
   async submit(
     @Body() createProductDto: CreateProductDto,
     @CurrentUser() user: User,
@@ -95,8 +99,8 @@ export class ProductController {
     return { id };
   }
 
+  @Roles([Role.MERCHANT])
   @Post("/discover")
-  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor("file", {
       storage: memoryStorage(), // Use memory storage
@@ -110,8 +114,14 @@ export class ProductController {
     return this.productService.discover(file.buffer);
   }
 
+  @Roles([Role.MERCHANT])
+  @Post("/price")
+  async predictPrice(@Body() product: { category: string; details: any }) {
+    return this.productService.predictPrice(product);
+  }
+
   @Post("/:id/image/add")
-  @UseGuards(JwtAuthGuard)
+  @Roles([Role.MERCHANT])
   @UseInterceptors(
     FileInterceptor("file", {
       storage: memoryStorage(), // Use memory storage
@@ -139,7 +149,7 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles([Role.MERCHANT])
   @Get("property")
   async getMyProducts(@CurrentUser() user) {
     return this.productService.findByUserId(user.id);
@@ -150,14 +160,14 @@ export class ProductController {
     return this.productService.getProductOwner(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Roles([Role.MERCHANT])
   @Patch(":id")
   update(@Param("id") id: string, @Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(id, updateProductDto);
   }
 
+  @Roles([Role.MERCHANT])
   @Delete(":id")
-  @UseGuards(JwtAuthGuard)
   remove(@Param("id") id: string) {
     return this.productService.remove(id);
   }
