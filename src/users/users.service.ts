@@ -4,8 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from './entities/user.entity';
-import { get } from 'http';
-
+import uuid = require('uuid');
 @Injectable()
 export class UsersService {
   constructor(
@@ -27,7 +26,7 @@ export class UsersService {
   
   CreateFirstUser() {
     //new uuid
-    const uuid = require('uuid');
+    // const uuid = require('uuid');
     
     const user = new this.userModel({
       
