@@ -25,7 +25,7 @@ dotenv.config();
       rootPath: "uploads",
       serveRoot: "/uploads", // This will serve files from /uploads URL path
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot("mongodb+srv://consommi:consommi@mainnode.m4kefk0.mongodb.net/ConsommiDotTN?retryWrites=true&w=majority&appName=MainNode"),
 
     ConfigModule.forRoot({ isGlobal: true }),
     UsersModule,
