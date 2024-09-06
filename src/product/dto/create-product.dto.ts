@@ -1,10 +1,18 @@
-import { NotFoundException } from '@nestjs/common';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
-import { Type } from 'class-transformer';
-import { IsDefined, IsEnum, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
-import { City } from 'src/enum/city.enum';
-import { ApproveStatus } from 'src/enum/product-approve-status.enum';
-import { Category } from 'src/enum/product-category.enum';
+import { Type } from "class-transformer";
+import { IsEnum, IsNotEmpty, ValidateNested } from "class-validator";
+import { City } from "src/enum/city.enum";
+import { Category } from "src/enum/product-category.enum";
+import {
+  AnimalDetails,
+  CarDetails,
+  ClothesDetails,
+  FurnitureDetails,
+  JewelryDetails,
+  LaptopDetails,
+  PhoneDetails,
+  TechDetails,
+} from "../entities/product.entity";
+import { BadRequestException } from "@nestjs/common";
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -19,60 +27,45 @@ export class CreateProductDto {
   discount: number;
   @IsNotEmpty()
   isAvailable: boolean;
-  @IsNotEmpty()
-  @IsEnum(ApproveStatus)
-  status: ApproveStatus;
+
   @IsNotEmpty()
   category: Category;
+
   @IsNotEmpty()
+  @IsEnum(City)
   location: City;
-  @IsNotEmpty()
-  image: string;
+
   @IsNotEmpty()
   @ValidateNested()
-  @Type((value: any) =>{
-    console.log(JSON.stringify
-    (value)
-    );
-    if (value.newObject.category==='clothes') 
-        return ClothesDetailsDto;
-    if (value.newObject.category==='tech')
-        return TechDetailsDto;
-    throw new NotFoundException('Invalid category');
-    
+  @Type((obj: any) => {
+    switch (obj.object.category) {
+      case Category.TECH:
+        return TechDetails;
+      case Category.JEWELRY:
+        return JewelryDetails;
+      case Category.CLOTHES:
+        return ClothesDetails;
+      case Category.FURNITURE:
+        return FurnitureDetails;
+      case Category.ANIMAL:
+        return AnimalDetails;
+      case Category.CAR:
+        return CarDetails;
+      case Category.PHONE:
+        return PhoneDetails;
+      case Category.LAPTOP:
+        return LaptopDetails;
+      default:
+        throw new BadRequestException("infound category");
+    }
   })
-  details: ClothesDetailsDto | TechDetailsDto;
-}
-
-export class ClothesDetailsDto {
-  @IsNotEmpty()
-  brand: string;
-  @IsOptional()
-  color: number;
-  @IsOptional()
-  functionality: string;
-  @IsOptional()
-  material: string;
-  @IsOptional()
-  seasonality: string;
-  @IsOptional()
-  size: string;
-  @IsOptional()
-  style: string;
-  @IsOptional()
-  type: string;
-}
-
-export class TechDetailsDto {
-  batteryLife: string;
-  brand: string;
-  cpu: string;
-  features: string;
-  gpu: string;
-  os: string;
-  ram: string;
-  screenSize: string;
-  storage: string;
-  @IsNotEmpty()
-  type: string;
+  details:
+    | TechDetails
+    | PhoneDetails
+    | LaptopDetails
+    | JewelryDetails
+    | ClothesDetails
+    | FurnitureDetails
+    | CarDetails
+    | AnimalDetails;
 }

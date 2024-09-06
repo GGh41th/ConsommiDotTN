@@ -2,7 +2,8 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456V
+
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
@@ -21,6 +22,27 @@
 </p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+
+## Usage
+
+- GET : /demand/received/ : allows ADMIN to list all PENDING requests
+- GET : /demand/received/all : allows ADMIN to list all received requests
+- POST : /demand/request : allows CONSUMER to send request to be promoted to MERCHANT
+- DELETE : /demand/cancel : allows CONSUMER to cancel his PENDING requests before ADMIN responds
+- PATCH : /demand/grant/{userId} : allows ADMIN to grant CONSUMER with {userId} the MERCHANT Role (if already MERCHANT
+  he
+  stays MERCHANT )
+- PATCH : /demand/revoke/{userId} : allows ADMIN to revoke CONSUMER with {userId} the MERCHANT's Role down to CONSUMER
+  again (he stays CONSUMER if already CONSUMER)
+- GET : /demand/granted : allows ADMIN to list all MERCHANTS he granted the role
+- GET : demand/sent : allows CONSUMER/MERCHANT to see the request details they sent
+  Demand {
+  "userId": "665bcee36a8214438b2324ad",
+  "status": "approved",
+  "id": "665d0fd176c62c1b2821a54b",
+  "createdAt": "2024-06-03T00:35:29.519Z",
+  "updatedAt": "2024-06-03T01:06:02.424Z"
+  }
 
 ## Description
 
@@ -60,7 +82,8 @@ $ npm run test:cov
 
 ## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If
+you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
 

@@ -1,89 +1,109 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from './entities/user.entity';
-import uuid = require('uuid');
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
+import { User } from "./entities/user.entity";
+import * as bcrypt from "bcrypt";
+import { Role } from "../enum/user-role.enum";
+import { ChangePasswordDto } from "./dto/change-password.dto";
+
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel('User') private readonly userModel: Model<User>,
-  ) {}
+  constructor(@InjectModel("User") private readonly userModel: Model<User>) {}
 
-  
-  create(createUserDto: CreateUserDto) {
-    //print the user
-    const uuid = require('uuid');
-    const newUser ={
-      id: uuid.v4(),
-      ...createUserDto,
+  /**
+   * adds a User object into the database
+
+   * @param user : User must be a User object, id and _id should not be provided
+   */
+  async add(user: User) {
+    const userDocument = new this.userModel(user);
+    userDocument.id = userDocument._id.toString();
+    return await userDocument.save();
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return User.fromDoc(
+      await this.userModel.findOne({ email: email }).lean().exec(),
+    );
+  }
+
+  async findAll(transform: boolean = true): Promise<User[]> {
+    const users = await this.userModel.find().lean().exec();
+    if (transform || true) return users.map((doc) => User.fromDoc(doc));
+  }
+
+  async findOne(id: string): Promise<User> {
+    console.log(id);
+    if (!id) {
+      throw new BadRequestException("Id should be Provided");
     }
-    console.log(newUser);
-    const user = new this.userModel(newUser);
-    return user.save();
-  }
-  
-  CreateFirstUser() {
-    //new uuid
-    // const uuid = require('uuid');
-    
-    const user = new this.userModel({
-      
-      id: uuid.v4(),
-      name: 'John',
-      lastName: 'Doe',
-      email: 'John@mail',
-      password: '12345678',
-      phone: '12345678',
-      address: {
-        city: 'Tunis',
-        street: 'Tunis',
-        postalCode: '1000',
-      },
-      isApproved: true,
-      role: 'admin',});
-    return user.save();
+    const userDoc = await this.userModel.findById(id).lean().exec();
+
+    return User.fromDoc(userDoc);
   }
 
-
-  findAll() {
-    return this.userModel.find();
-  }
-
-  findOne(id: string) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     //verify the user exist
-    this.verifyUserExsitance(id);
-    //find the user
-    const user = this.userModel.findOne({id:id});
-    return user;
+    await this.verifyUserExsitance(id);
+
+    return await this.userModel
+      .findOneAndUpdate({ id: id }, updateUserDto)
+      .lean()
+      .exec();
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
+  async remove(id: string) {
     //verify the user exist
-    this.verifyUserExsitance(id);
-    
-    const user = this.userModel.findOneAndUpdate({id:id},updateUserDto);
-    
-    return user;
+    await this.verifyUserExsitance(id);
+
+    return await this.userModel.findOneAndDelete({ id: id }).lean().exec();
   }
 
-  remove(id: string) {
-    //verify the user exist
-    this.verifyUserExsitance(id);
-    //delete the user
-    const user = this.userModel.findOneAndUpdate({id:id});
-    return user;
-  }
-   
-  verifyUserExsitance(id: string) {
-    //verify the user exist
-    const finduser = this.userModel.findOne({id:id});
-    if((!finduser)){
-      throw new Error('User not found');
-    }
-   
+  async verifyUserExsitance(id: string): Promise<void> {
+    const finduser: User = await this.findOne(id);
+    if (!Boolean(finduser)) throw new NotFoundException("user not found");
   }
 
+  async changeRole(userId: string, grant: boolean) {
+    const user = await this.findOne(userId);
+    if (!user) throw new NotFoundException("user doesn't not exist");
+    return this.userModel
+      .findOneAndUpdate(
+        { id: userId },
+        {
+          role: grant ? Role.MERCHANT : Role.CONSUMER,
+        },
+      )
+      .lean()
+      .exec();
+  }
 
+  async getAllSellers() {
+    const users = await this.userModel
+      .find({ role: Role.MERCHANT })
+      .lean()
+      .exec();
+    return User.fromArray(users);
+  }
+
+  async changePassword(user: User, changePasswordDto: ChangePasswordDto) {
+    let u = await this.findOne(user.id);
+    const isSame = await bcrypt.compare(changePasswordDto.password, u.password);
+    if (!isSame) throw new ForbiddenException("Old password is not correct");
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      salt,
+    );
+    await this.userModel
+      .findByIdAndUpdate(user.id, { password: hashedPassword })
+      .lean()
+      .exec();
+  }
 }
