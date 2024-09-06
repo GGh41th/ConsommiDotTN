@@ -19,7 +19,7 @@ import {
   Product,
   TechDetails,
 } from "./entities/product.entity";
-import { ImageService } from "src/image/image.service";
+import { ImageService } from "../image/image.service";
 import axios from "axios";
 import * as process from "process";
 import { User } from "../users/entities/user.entity";

@@ -3,7 +3,7 @@ import {
   ClothesDetails,
   LaptopDetails,
   PhoneDetails,
-} from "../src/product/entities/product.entity";
+} from "product/entities/product.entity";
 
 const dimitri = {
   email: "dimitri.petrinko@consommi.tn",

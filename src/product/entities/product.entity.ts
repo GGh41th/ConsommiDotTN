@@ -1,8 +1,8 @@
 import { Prop, Schema } from "@nestjs/mongoose";
 import mongoose from "mongoose";
-import { City } from "src/enum/city.enum";
-import { ApproveStatus } from "src/enum/product-approve-status.enum";
-import { Category } from "src/enum/product-category.enum";
+import { City } from "../../enum/city.enum";
+import { ApproveStatus } from "../../enum/product-approve-status.enum";
+import { Category } from "../../enum/product-category.enum";
 import { User } from "../../users/entities/user.entity";
 import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 

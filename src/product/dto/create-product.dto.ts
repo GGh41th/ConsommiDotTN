@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsEnum, IsNotEmpty, ValidateNested } from "class-validator";
-import { City } from "src/enum/city.enum";
-import { Category } from "src/enum/product-category.enum";
+import { City } from "../../enum/city.enum";
+import { Category } from "../../enum/product-category.enum";
 import {
   AnimalDetails,
   CarDetails,
