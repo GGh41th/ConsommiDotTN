@@ -22,13 +22,20 @@ export class AppController {
 
   @Get()
   async getDocuments() {
-    return fs.readFileSync("public/index.html", "utf-8");
+    try{
+      return fs.readFileSync("public/index.html", "utf-8");
+    }catch(e){
+      return fs.readFileSync("../public/index.html", "utf-8");
+    }
   }
 
   @Get("/public/index.js")
   async getJsFile() {
-    return fs.readFileSync("public/index.js", "utf-8");
-  }
+    try{
+      return fs.readFileSync("public/index.js", "utf-8");
+    }catch(e){
+      return fs.readFileSync("../public/index.js", "utf-8");
+    }  }
 
   @Roles([Role.ADMIN, Role.GUEST])
   @Get("test")
