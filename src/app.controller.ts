@@ -22,7 +22,7 @@ export class AppController {
 
   @Get()
   async getDocuments() {
-    return fs.readFileSync("index.html", "utf-8");
+    return fs.readFileSync("public/index.html", "utf-8");
   }
 
   @Get("/public/index.js")
