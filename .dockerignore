@@ -1,0 +1,55 @@
+Conception
+uploads
+# Node modules (exclude if you're copying them in a separate step)
+node_modules
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Dependency directories for package managers
+.pnpm-store
+.npm
+.yarn
+.cache
+
+# Source control
+.git
+.gitignore
+
+# Build output (exclude if you want to use the built app)
+dist
+build
+
+# Tests and coverage reports
+coverage
+*.spec.js
+*.test.js
+__tests__
+jest.config.js
+
+# Editor and IDE settings
+.vscode
+.idea
+*.swp
+*.swo
+
+# Temporary files
+tmp
+temp
+
+*.md
+
+.prettierrc.old
