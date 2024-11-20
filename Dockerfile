@@ -41,10 +41,10 @@ COPY --chown=node:node * ./
 
 # added the healthcheck to check for the operational status of the application , added the --fail option to the curl command
 # because by default curl will return 0 status code even if it gets an http error back
-HEALTHCHECK --interval=30 \
-            --timeout=20 \
+HEALTHCHECK --interval=30s \
+            --timeout=20s \
             --retries=4 \
-            --start-period=0 \ 
+            --start-period=0s \ 
             CMD curl --fail localhost:3000 || exit 1
 
 # Run the starting command in a json array form so it doesn't get shell-wrapped , otherwise the shell itself will get the pid 1
